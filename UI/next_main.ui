@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>722</width>
+    <height>247</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/simulation/cowork.png</normaloff>:/simulation/cowork.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>41</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>41</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Agency FB</family>
+            <pointsize>20</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>A change in the way we work</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QCommandLinkButton" name="btn_testAutomationTool">
+          <property name="text">
+           <string>Test Automation Tool (Pilot)</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/auto_test.png</normaloff>:/simulation/auto_test.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCommandLinkButton" name="btn_nodeEditor">
+          <property name="text">
+           <string>Node Editor</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/node_editor.png</normaloff>:/simulation/node_editor.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QCommandLinkButton" name="btn_logEditor">
+          <property name="text">
+           <string>Log Analysis Editor</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/log_editor.png</normaloff>:/simulation/log_editor.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCommandLinkButton" name="btn_safeIn">
+          <property name="text">
+           <string>Safe In</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/safe_in.png</normaloff>:/simulation/safe_in.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCommandLinkButton" name="btn_ipManager">
+          <property name="text">
+           <string>IP Management</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/ip_manager.png</normaloff>:/simulation/ip_manager.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCommandLinkButton" name="commandLinkButton_6">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/add_data.png</normaloff>:/simulation/add_data.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCommandLinkButton" name="commandLinkButton_7">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/add_data.png</normaloff>:/simulation/add_data.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCommandLinkButton" name="commandLinkButton_8">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/add_data.png</normaloff>:/simulation/add_data.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QCommandLinkButton" name="commandLinkButton_9">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/simulation/add_data.png</normaloff>:/simulation/add_data.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>722</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources>
+  <include location="icon/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

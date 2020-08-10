@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>widget</class>
+ <widget class="QWidget" name="widget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>627</width>
+    <height>94</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_9">
+   <item row="0" column="0">
+    <widget class="QFrame" name="column_frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_8">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="lbl_seq">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lbl_warning">
+          <property name="minimumSize">
+           <size>
+            <width>12</width>
+            <height>12</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="cb_refMthod">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>400</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Reference Method</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Fixed Value</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/nail.png</normaloff>:/simulation/nail.png</iconset>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DataList</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/link.png</normaloff>:/simulation/link.png</iconset>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>SQL</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/sql.png</normaloff>:/simulation/sql.png</iconset>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Excel</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/excel.png</normaloff>:/simulation/excel.png</iconset>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Row Level</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/row_level.png</normaloff>:/simulation/row_level.png</iconset>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Today</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/simulation/today.png</normaloff>:/simulation/today.png</iconset>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="edt_dataList">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLineEdit" name="edt_column">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="edt_target">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QSpinBox" name="sb_row">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>45</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <number>500</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_columnId">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Field Id</string>
+            </property>
+            <property name="text">
+             <string>eqp_mdl_cd</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="2">
+             <widget class="QCheckBox" name="chk_marking">
+              <property name="text">
+               <string>Marking</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="edt_description">
+              <property name="text">
+               <string>가입단말모델(입력값)</string>
+              </property>
+              <property name="readOnly">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="chk_isInputValue">
+              <property name="toolTip">
+               <string>입력값</string>
+              </property>
+              <property name="text">
+               <string>Input Value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="icon/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

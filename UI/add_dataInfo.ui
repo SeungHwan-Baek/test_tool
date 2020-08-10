@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>687</width>
+    <height>529</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_5">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboBox">
+         <item>
+          <property name="text">
+           <string>JSON</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>TABLE</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Type</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QStackedWidget" name="stackedWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="page">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="CodeEditor" name="edt_dataInfo">
+           <property name="plainText">
+            <string>{'input1': [{'svc_num': '01041262003',
+   'co_cl_cd': 'T',
+   'wagree_cl_cd': '',
+   'mgmt_svc_cd': 'C,W,I,P,T,N,A',
+   'mass_co_cl_cd': '1',
+   'term_svc_brws_typ_cd': '1',
+   'skip_message_yn': 'Y',
+   'rowStatus': 'C'}],
+ 'HEAD': {'Trx_Code': 'ZORDSUDCS0020_TR01',
+  'Ngms_UserId': '1000495877',
+  'Ngms_LogInId': 'YUNWOONG',
+  'Ngms_EmpNum': '',
+  'Ngms_OrgId': 'A000700000',
+  'Ngms_HrOrgCd': '',
+  'Ngms_PostOrgCd': 'A000700000',
+  'Ngms_PostSaleOrgCd': 'A000700000',
+  'Ngms_SupSaleOrgCd': 'A010890000',
+  'Ngms_IpAddr': '150.28.79.196',
+  'Ngms_BrTypCd': '450',
+  'Ngms_AuthId': '',
+  'Ngms_ConnOrgId': 'A000700000',
+  'Ngms_ConnOrgCd': 'A000700000',
+  'Ngms_ConnSaleOrgId': 'A000700000',
+  'Ngms_ConnSaleOrgCd': 'A000700000',
+  'Ngms_AuthTypPermCd': 'EQ',
+  'Ngms_PostSaleOrgId': 'A000700000',
+  'Ngms_SupSaleOrgId': 'A010890000',
+  'Term_Type': '0',
+  'User_Term_Type': '',
+  'St_Stop': '0',
+  'St_Trace': '',
+  'Stx_Dt': '',
+  'Stx_Tm': '',
+  'Etx_Dt': '',
+  'Etx_Tm': '',
+  'Rt_Cd': '',
+  'Screen_Name': 'ZORDSUDCS0020',
+  'Msg_Cnt': '0',
+  'Handle_Id': '848258419 ',
+  'Ngms_Filler1': '',
+  'Ngms_CoClCd': 'T',
+  'Screen_Call_Trace': 'Top-ZORDSS03S0000-ZORDSUDCS0020_TR01',
+  'rowStatus': 'C'}}</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_2">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QTableWidget" name="tableWidget"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CodeEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>widgets/codeEditorWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>511</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>517</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

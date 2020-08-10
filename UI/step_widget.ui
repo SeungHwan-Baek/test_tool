@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_4">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter_step_data">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QFrame" name="verticalFrame">
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="toolbar_layout"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cb_addInfo">
+            <item>
+             <property name="text">
+              <string/>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>설명</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>수행시간</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>타입</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTreeWidget" name="tw_testStep">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::InternalMove</enum>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::MoveAction</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="rootIsDecorated">
+           <bool>true</bool>
+          </property>
+          <property name="headerHidden">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string notr="true">step</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>seq</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>step_id</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>345</width>
+     <height>95</height>
+    </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>속성</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QTreeWidget" name="tw_property">
+       <property name="indentation">
+        <number>15</number>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>true</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>false</bool>
+       </property>
+       <property name="itemsExpandable">
+        <bool>true</bool>
+       </property>
+       <property name="animated">
+        <bool>false</bool>
+       </property>
+       <property name="allColumnsShowFocus">
+        <bool>false</bool>
+       </property>
+       <property name="headerHidden">
+        <bool>false</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>true</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Properties</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Value</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Data</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QGridLayout" name="gridLayout_6">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QStackedWidget" name="sw_stepDtl">
+       <property name="currentIndex">
+        <number>3</number>
+       </property>
+       <widget class="QWidget" name="grp_none"/>
+       <widget class="QWidget" name="grp_groupInfo">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QSplitter" name="splitter">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <widget class="QWidget" name="layoutWidget">
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>&lt;h4&gt;&lt;font color='DodgerBlue'&gt; Variable &lt;/font&gt;&lt;/h4&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="tw_groupVariable">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>variable_id</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget_2">
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h4 style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:medium; font-weight:600; color:#1e90ff;&quot;&gt;Reference&lt;/span&gt;&lt;/h4&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="tw_groupReference">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>reference_id</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="grp_xhr">
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QSplitter" name="splitter_list_data">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <widget class="QTreeWidget" name="tw_dataList">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>Data List</string>
+             </property>
+            </column>
+           </widget>
+           <widget class="QTabWidget" name="tabWidget">
+            <property name="tabPosition">
+             <enum>QTabWidget::South</enum>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>Data</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QTableView" name="tw_data">
+                <property name="contextMenuPolicy">
+                 <enum>Qt::CustomContextMenu</enum>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>150</number>
+                </attribute>
+                <attribute name="horizontalHeaderHighlightSections">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_2">
+             <attribute name="title">
+              <string>Column Info</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QTableWidget" name="tw_columnInfo">
+                <property name="contextMenuPolicy">
+                 <enum>Qt::CustomContextMenu</enum>
+                </property>
+                <property name="editTriggers">
+                 <set>QAbstractItemView::NoEditTriggers</set>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <attribute name="horizontalHeaderHighlightSections">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+                <column>
+                 <property name="text">
+                  <string>Column ID</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Description</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_2"/>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="action_group">
+   <property name="text">
+    <string>Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Group</string>
+   </property>
+  </action>
+  <action name="action_removeStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/remove_step.png</normaloff>:/step/remove_step.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove This Step</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove This Step</string>
+   </property>
+   <property name="statusTip">
+    <string>Remove Step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="action_newStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/new_step.png</normaloff>:/step/new_step.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>New Step</string>
+   </property>
+   <property name="statusTip">
+    <string>Step 추가</string>
+   </property>
+  </action>
+  <action name="action_openTestStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/open_step.png</normaloff>:/step/open_step.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step 열기</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Test Step</string>
+   </property>
+   <property name="statusTip">
+    <string>Open Test Step</string>
+   </property>
+  </action>
+  <action name="action_removeAllStep">
+   <property name="text">
+    <string>remove All Step</string>
+   </property>
+   <property name="toolTip">
+    <string>remove All Step</string>
+   </property>
+   <property name="statusTip">
+    <string>remove All Step</string>
+   </property>
+  </action>
+  <action name="action_saveTestStepGroup">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Step 그룹 저장...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Test Step Group</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Step Group</string>
+   </property>
+  </action>
+  <action name="action_removeStepByExlTrList">
+   <property name="text">
+    <string>remove Step By Excluded Tr List</string>
+   </property>
+   <property name="toolTip">
+    <string>remove Step By Excluded Tr List</string>
+   </property>
+   <property name="statusTip">
+    <string>remove Step By Excluded Tr List</string>
+   </property>
+  </action>
+  <action name="action_replayXhr">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/replay.png</normaloff>:/step/replay.png</iconset>
+   </property>
+   <property name="text">
+    <string>Replay Step</string>
+   </property>
+   <property name="toolTip">
+    <string>Replay Step</string>
+   </property>
+   <property name="statusTip">
+    <string>Replay Step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
+   </property>
+  </action>
+  <action name="action_copyTestData">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/step_copy.png</normaloff>:/step/step_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Test Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy Test Data</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy Test Data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+C</string>
+   </property>
+  </action>
+  <action name="action_replayAllXhrToDown">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/replay.png</normaloff>:/step/replay.png</iconset>
+   </property>
+   <property name="text">
+    <string>Replay All Step to Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Replay All Step to Down</string>
+   </property>
+   <property name="statusTip">
+    <string>Replay All Step to Down</string>
+   </property>
+  </action>
+  <action name="action_transactionLog">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/simulation/log.png</normaloff>:/simulation/log.png</iconset>
+   </property>
+   <property name="text">
+    <string>Transaction Log</string>
+   </property>
+   <property name="toolTip">
+    <string>Transaction Log</string>
+   </property>
+   <property name="statusTip">
+    <string>Transaction Log</string>
+   </property>
+  </action>
+  <action name="action_saveTestStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Step 저장</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Test Step</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Step</string>
+   </property>
+  </action>
+  <action name="action_getTrIOInfo">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Get Transaction IO Info</string>
+   </property>
+   <property name="toolTip">
+    <string>Get Transaction IO Info</string>
+   </property>
+   <property name="statusTip">
+    <string>Get Transaction IO Info</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+  </action>
+  <action name="action_addExclutionTrList">
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/exclution.png</normaloff>:/step/exclution.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add to Exclution Tr List</string>
+   </property>
+   <property name="toolTip">
+    <string>Add to exclusion transaction list</string>
+   </property>
+   <property name="statusTip">
+    <string>Add to exclusion transaction list</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_addDataList">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Add Data List</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Data List</string>
+   </property>
+   <property name="statusTip">
+    <string>Add Data List</string>
+   </property>
+  </action>
+  <action name="action_declareVariable">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>변수선언</string>
+   </property>
+   <property name="toolTip">
+    <string>Declare Variable</string>
+   </property>
+   <property name="statusTip">
+    <string>변수선언</string>
+   </property>
+  </action>
+  <action name="action_setReference">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/ref/ref.png</normaloff>:/ref/ref.png</iconset>
+   </property>
+   <property name="text">
+    <string>참조 설정</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Reference</string>
+   </property>
+   <property name="statusTip">
+    <string>참조 설정</string>
+   </property>
+  </action>
+  <action name="action_getReferenceValue">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/get.png</normaloff>:/step/get.png</iconset>
+   </property>
+   <property name="text">
+    <string>참조 값 가져오기...</string>
+   </property>
+   <property name="toolTip">
+    <string>Get Reference Value</string>
+   </property>
+   <property name="statusTip">
+    <string>참조 값 가져오기</string>
+   </property>
+  </action>
+  <action name="action_setRefByValue">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>변수로 선언 후 동일 값 연결</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Reference By Value</string>
+   </property>
+   <property name="statusTip">
+    <string>변수로 선언 후 동일 값 연결</string>
+   </property>
+  </action>
+  <action name="action_removeVariable">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/remove_variable.png</normaloff>:/variable/remove_variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>변수삭제</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove Variable</string>
+   </property>
+   <property name="statusTip">
+    <string>변수삭제</string>
+   </property>
+  </action>
+  <action name="action_romoveReference">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/ref/remove_ref.png</normaloff>:/ref/remove_ref.png</iconset>
+   </property>
+   <property name="text">
+    <string>참조 삭제</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove Reference</string>
+   </property>
+   <property name="statusTip">
+    <string>참조 삭제</string>
+   </property>
+  </action>
+  <action name="action_beforeNewStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>현재 Step 앞에..</string>
+   </property>
+   <property name="toolTip">
+    <string>Add before current step</string>
+   </property>
+   <property name="statusTip">
+    <string>현재 Step 앞에..</string>
+   </property>
+  </action>
+  <action name="action_afterNewStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>현재 Step 뒤에..</string>
+   </property>
+   <property name="toolTip">
+    <string>Add after current step</string>
+   </property>
+   <property name="statusTip">
+    <string>현재 Step 뒤에..</string>
+   </property>
+  </action>
+  <action name="action_ifNewStep">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>조건문에 Step 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>Add step inside conditional statement</string>
+   </property>
+   <property name="statusTip">
+    <string>조건문에 Step 추가</string>
+   </property>
+  </action>
+  <action name="action_addNewStepToGroup">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/new_step.png</normaloff>:/step/new_step.png</iconset>
+   </property>
+   <property name="text">
+    <string>그룹에 Step 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>그룹에 Step 추가</string>
+   </property>
+   <property name="statusTip">
+    <string>그룹에 Step 추가</string>
+   </property>
+  </action>
+  <action name="action_moveToUp">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/move_to_up.png</normaloff>:/step/move_to_up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step을 위로 이동</string>
+   </property>
+   <property name="toolTip">
+    <string>Step을 위로 이동</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 위로 이동</string>
+   </property>
+  </action>
+  <action name="action_moveToDown">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/move_to_down.png</normaloff>:/step/move_to_down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step을 아래로 이동</string>
+   </property>
+   <property name="toolTip">
+    <string>Step을 아래로 이동</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 아래로 이동</string>
+   </property>
+  </action>
+  <action name="action_addDataColumn">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/add_data_column.png</normaloff>:/step/add_data_column.png</iconset>
+   </property>
+   <property name="text">
+    <string>Column 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>Column 추가</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 위로 이동</string>
+   </property>
+  </action>
+  <action name="action_addDataRow">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/add_data_row.png</normaloff>:/step/add_data_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Row 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>Row 추가</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 위로 이동</string>
+   </property>
+  </action>
+  <action name="action_deleteDataColumn">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/delete_data_column.png</normaloff>:/step/delete_data_column.png</iconset>
+   </property>
+   <property name="text">
+    <string>Column 삭제</string>
+   </property>
+   <property name="toolTip">
+    <string>Column 삭제</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 위로 이동</string>
+   </property>
+  </action>
+  <action name="action_deleteDataRow">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/delete_data_row.png</normaloff>:/step/delete_data_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Row 삭제</string>
+   </property>
+   <property name="toolTip">
+    <string>Row 삭제</string>
+   </property>
+   <property name="statusTip">
+    <string>Step을 위로 이동</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="icon/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

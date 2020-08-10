@@ -1,0 +1,117 @@
+<RCC>
+  <qresource prefix="case">
+    <file>category_setting.png</file>
+    <file>case_setting.png</file>
+    <file>remove_case.png</file>
+    <file>remove_category.png</file>
+    <file>schedule.png</file>
+    <file>collapse.png</file>
+    <file>expand.png</file>
+    <file>add_category.png</file>
+    <file>tr_test.png</file>
+    <file>open_folder.png</file>
+    <file>ui_test.png</file>
+    <file>reset_row.png</file>
+    <file>marking_data.png</file>
+    <file>play.png</file>
+    <file>running.png</file>
+    <file>circle_arrow.png</file>
+    <file>open_case.png</file>
+    <file>add_case.png</file>
+  </qresource>
+  <qresource prefix="db">
+    <file>db_connect.png</file>
+    <file>db_disconnect.png</file>
+  </qresource>
+  <qresource prefix="find">
+    <file>search.png</file>
+    <file>up_arrow.png</file>
+    <file>down_arrow.png</file>
+  </qresource>
+  <qresource prefix="main">
+    <file>bar_chart.png</file>
+    <file>auto_test_main(s).png</file>
+    <file>command_main.png</file>
+    <file>reload.png</file>
+    <file>list.png</file>
+    <file>auto_test_main.png</file>
+  </qresource>
+  <qresource prefix="variable">
+    <file>remove_step.png</file>
+    <file>unvar_and_unlink.png</file>
+    <file>unvar_and_link.png</file>
+    <file>rename.png</file>
+    <file>remove_variable.png</file>
+    <file>var_and_unlink.png</file>
+    <file>var.png</file>
+    <file>var_and_link.png</file>
+    <file>unvar.png</file>
+    <file>variable.png</file>
+  </qresource>
+  <qresource prefix="step">
+    <file>apply.png</file>
+    <file>delete_data_column.png</file>
+    <file>delete_data_row.png</file>
+    <file>add_data_column.png</file>
+    <file>add_data_row.png</file>
+    <file>setting.png</file>
+    <file>combo.png</file>
+    <file>grid.png</file>
+    <file>send.png</file>
+    <file>computer_vision.png</file>
+    <file>switch_frame.png</file>
+    <file>execute_script.png</file>
+    <file>type.png</file>
+    <file>refresh.png</file>
+    <file>exclution.png</file>
+    <file>move_to_down.png</file>
+    <file>move_to_up.png</file>
+    <file>step_copy.png</file>
+    <file>remove_step.png</file>
+    <file>new_step.png</file>
+    <file>correct.png</file>
+    <file>skip.png</file>
+    <file>add.png</file>
+    <file>json.png</file>
+    <file>get.png</file>
+    <file>replay.png</file>
+    <file>remove.png</file>
+    <file>open_step.png</file>
+    <file>add_step.png</file>
+    <file>error.png</file>
+    <file>browser.png</file>
+    <file>component.png</file>
+    <file>loop.png</file>
+    <file>validation.png</file>
+    <file>if.png</file>
+    <file>xhr.png</file>
+    <file>circle_arrow.png</file>
+    <file>sleep.png</file>
+  </qresource>
+  <qresource prefix="browser">
+    <file>record.png</file>
+    <file>stop.png</file>
+    <file>clear.png</file>
+    <file>pause.png</file>
+    <file>pull_request.png</file>
+    <file>TSWING_64.ico</file>
+  </qresource>
+  <qresource prefix="suites">
+    <file>thead_stop.png</file>
+    <file>open_suites.png</file>
+    <file>new_suites.png</file>
+    <file>save_suites.png</file>
+  </qresource>
+  <qresource prefix="capture">
+    <file>rec.png</file>
+  </qresource>
+  <qresource prefix="ref">
+    <file>remove_ref.png</file>
+    <file>add_row.png</file>
+    <file>delete_row.png</file>
+    <file>excel.png</file>
+    <file>unlink.png</file>
+    <file>link.png</file>
+    <file>ref.png</file>
+  </qresource>
+</RCC>

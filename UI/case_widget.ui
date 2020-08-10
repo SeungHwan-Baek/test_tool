@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>386</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="tool_bar_layout"/>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="edt_search">
+       <property name="placeholderText">
+        <string>Search...</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btn_expandAll">
+       <property name="toolTip">
+        <string>Expand All</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="icon/res.qrc">
+         <normaloff>:/case/expand.png</normaloff>:/case/expand.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btn_collapseAll">
+       <property name="toolTip">
+        <string>Collapse All</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="icon/res.qrc">
+         <normaloff>:/case/collapse.png</normaloff>:/case/collapse.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QTreeWidget" name="tw_testCase">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="dragEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::InternalMove</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::IgnoreAction</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="autoExpandDelay">
+      <number>0</number>
+     </property>
+     <property name="indentation">
+      <number>30</number>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="headerDefaultSectionSize">
+      <number>34</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Test
+Case</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Case ID</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Category Id</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+  <action name="action_addTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/add_case.png</normaloff>:/case/add_case.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>New Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>New Test Case</string>
+   </property>
+  </action>
+  <action name="action_openTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/open_case.png</normaloff>:/case/open_case.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Open Test Case</string>
+   </property>
+  </action>
+  <action name="action_closeAllTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close All Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Close All Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Close All Test Case</string>
+   </property>
+  </action>
+  <action name="action_clearMarkingData">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Clear Marking Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear Marking Data</string>
+   </property>
+   <property name="statusTip">
+    <string>Marking Data View</string>
+   </property>
+  </action>
+  <action name="action_markingDataView">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/marking_data.png</normaloff>:/case/marking_data.png</iconset>
+   </property>
+   <property name="text">
+    <string>Marking Data View</string>
+   </property>
+   <property name="toolTip">
+    <string>Marking Data View</string>
+   </property>
+   <property name="statusTip">
+    <string>Marking Data View</string>
+   </property>
+  </action>
+  <action name="action_playCase">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/play.png</normaloff>
+     <normalon>:/suites/thead_stop.png</normalon>:/case/play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Case 수행</string>
+   </property>
+   <property name="toolTip">
+    <string>Case 수행</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_variableList">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>Variable List</string>
+   </property>
+   <property name="toolTip">
+    <string>Variable List</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_saveVariableList">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Variable</string>
+   </property>
+   <property name="toolTip">
+    <string>변수 저장...</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_loadVariableList">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Variable</string>
+   </property>
+   <property name="toolTip">
+    <string>변수 불러오기...</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_resetRowInfo">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/reset_row.png</normaloff>:/case/reset_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset Row Info</string>
+   </property>
+   <property name="toolTip">
+    <string>Row 정보 재설정</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_removeCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/remove_case.png</normaloff>:/case/remove_case.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Remove Step</string>
+   </property>
+  </action>
+  <action name="action_autoVariable">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Variable List</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto Variable List</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_copyTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Case</string>
+   </property>
+  </action>
+  <action name="action_saveTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Case</string>
+   </property>
+  </action>
+  <action name="action_pasteTestCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Paste Test Case</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste Test Case</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Case</string>
+   </property>
+  </action>
+  <action name="action_addCategory">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/add_category.png</normaloff>:/case/add_category.png</iconset>
+   </property>
+   <property name="text">
+    <string>Category 추가</string>
+   </property>
+   <property name="toolTip">
+    <string>Category 추가</string>
+   </property>
+   <property name="statusTip">
+    <string>New Test Case</string>
+   </property>
+  </action>
+  <action name="action_scheduleCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/schedule.png</normaloff>:/case/schedule.png</iconset>
+   </property>
+   <property name="text">
+    <string>Case 예약</string>
+   </property>
+   <property name="toolTip">
+    <string>Case 예약</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_removeCategory">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/remove_category.png</normaloff>:/case/remove_category.png</iconset>
+   </property>
+   <property name="text">
+    <string>Category 삭제</string>
+   </property>
+   <property name="toolTip">
+    <string>Category 삭제</string>
+   </property>
+   <property name="statusTip">
+    <string>New Test Case</string>
+   </property>
+  </action>
+  <action name="action_startSwing">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/browser/TSWING_64.ico</normaloff>:/browser/TSWING_64.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Start Swing</string>
+   </property>
+   <property name="toolTip">
+    <string>Start Swing</string>
+   </property>
+   <property name="statusTip">
+    <string>Start Swing</string>
+   </property>
+  </action>
+  <action name="action_capture">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/capture/rec.png</normaloff>
+     <normalon>:/browser/stop.png</normalon>:/capture/rec.png</iconset>
+   </property>
+   <property name="text">
+    <string>Capture 수행</string>
+   </property>
+   <property name="toolTip">
+    <string>Capture 수행</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
+  <action name="action_categorySetting">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/category_setting.png</normaloff>:/case/category_setting.png</iconset>
+   </property>
+   <property name="text">
+    <string>Category 수정</string>
+   </property>
+   <property name="toolTip">
+    <string>Category 수정</string>
+   </property>
+   <property name="statusTip">
+    <string>New Test Case</string>
+   </property>
+  </action>
+  <action name="action_getTransactionNm">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Transaction명 가져오기...</string>
+   </property>
+   <property name="toolTip">
+    <string>Transaction명 가져오기...</string>
+   </property>
+   <property name="statusTip">
+    <string>Save Test Case</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="icon/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
