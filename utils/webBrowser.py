@@ -390,7 +390,7 @@ class WebBrowser(object):
         '''
         chromedriver site 접속 가능여부 체크
         '''
-        url = "https://chromedriver.chromi123123um.org/downloads"
+        url = "https://chromedriver.chromium.org/downloads"
         try:
             res = urllib.request.urlopen(url)
 
@@ -408,7 +408,7 @@ class WebBrowser(object):
             - 온라인 연결이 가능한 경우는 다운로드
             - 온라인 연결이 불가능한 경우 임시 파일 중 가능한 버전으로 대체
         :param version: (str) '81'
-        :param chromedriver_path: (str) 'C:\Users\Administrator\Test_Tool'
+        :param chromedriver_path: (str)
         '''
         if self.chromedriverWebOn():
             print("Chromedriver Downloading...")
