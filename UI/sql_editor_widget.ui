@@ -184,7 +184,10 @@
     <string>Query Test</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Return</string>
+    <string>Ctrl+Enter, Ctrl+Return</string>
+   </property>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
    </property>
   </action>
  </widget>

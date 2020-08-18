@@ -237,7 +237,7 @@
      <item row="0" column="0">
       <widget class="QStackedWidget" name="sw_stepDtl">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="grp_none"/>
        <widget class="QWidget" name="grp_groupInfo">
@@ -376,7 +376,7 @@
              </property>
             </column>
            </widget>
-           <widget class="QTabWidget" name="tabWidget">
+           <widget class="QTabWidget" name="tab_dataDtl">
             <property name="tabPosition">
              <enum>QTabWidget::South</enum>
             </property>
@@ -402,11 +402,17 @@
               </property>
               <item row="0" column="0">
                <widget class="QTableView" name="tw_data">
+                <property name="focusPolicy">
+                 <enum>Qt::ClickFocus</enum>
+                </property>
                 <property name="contextMenuPolicy">
                  <enum>Qt::CustomContextMenu</enum>
                 </property>
                 <property name="selectionMode">
                  <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectItems</enum>
                 </property>
                 <attribute name="horizontalHeaderCascadingSectionResizes">
                  <bool>true</bool>
@@ -506,10 +512,10 @@
      <normaloff>:/step/remove_step.png</normaloff>:/step/remove_step.png</iconset>
    </property>
    <property name="text">
-    <string>Remove This Step</string>
+    <string>선택 Step 삭제</string>
    </property>
    <property name="toolTip">
-    <string>Remove This Step</string>
+    <string>선택 Step 삭제</string>
    </property>
    <property name="statusTip">
     <string>Remove Step</string>
@@ -562,10 +568,10 @@
   </action>
   <action name="action_removeAllStep">
    <property name="text">
-    <string>remove All Step</string>
+    <string>모든 Step 삭제</string>
    </property>
    <property name="toolTip">
-    <string>remove All Step</string>
+    <string>모든 Step 삭제</string>
    </property>
    <property name="statusTip">
     <string>remove All Step</string>
@@ -590,13 +596,13 @@
   </action>
   <action name="action_removeStepByExlTrList">
    <property name="text">
-    <string>remove Step By Excluded Tr List</string>
+    <string>제외리스트 Step 모두 삭제</string>
    </property>
    <property name="toolTip">
-    <string>remove Step By Excluded Tr List</string>
+    <string>제외리스트 Step 모두 삭제</string>
    </property>
    <property name="statusTip">
-    <string>remove Step By Excluded Tr List</string>
+    <string>제외리스트 Step 모두 삭제</string>
    </property>
   </action>
   <action name="action_replayXhr">
@@ -620,7 +626,7 @@
     <string>Replay Step</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+R</string>
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="action_copyTestData">
@@ -676,8 +682,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>:/simulation/log.png</normaloff>:/simulation/log.png</iconset>
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/step/log_editor.png</normaloff>:/step/log_editor.png</iconset>
    </property>
    <property name="text">
     <string>Transaction Log</string>
@@ -708,13 +714,13 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Get Transaction IO Info</string>
+    <string>Transaction IO 정보 가져오기...</string>
    </property>
    <property name="toolTip">
-    <string>Get Transaction IO Info</string>
+    <string>Transaction IO 정보 가져오기...</string>
    </property>
    <property name="statusTip">
-    <string>Get Transaction IO Info</string>
+    <string>Transaction IO 정보 가져오기...</string>
    </property>
    <property name="whatsThis">
     <string/>
@@ -726,13 +732,13 @@
      <normaloff>:/step/exclution.png</normaloff>:/step/exclution.png</iconset>
    </property>
    <property name="text">
-    <string>Add to Exclution Tr List</string>
+    <string>제외리스트에 추가</string>
    </property>
    <property name="toolTip">
-    <string>Add to exclusion transaction list</string>
+    <string>제외리스트에 추가</string>
    </property>
    <property name="statusTip">
-    <string>Add to exclusion transaction list</string>
+    <string>XHR Step을 제외리스트에 추가</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
@@ -1056,6 +1062,42 @@
    </property>
    <property name="statusTip">
     <string>Step을 위로 이동</string>
+   </property>
+  </action>
+  <action name="action_declareVariableColumn">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/variable.png</normaloff>:/variable/variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>변수선언 (Column)</string>
+   </property>
+   <property name="toolTip">
+    <string>Declare Variable (Column)</string>
+   </property>
+   <property name="statusTip">
+    <string>변수선언</string>
+   </property>
+  </action>
+  <action name="action_removeVariableColumn">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/remove_variable.png</normaloff>:/variable/remove_variable.png</iconset>
+   </property>
+   <property name="text">
+    <string>변수삭제 (Column)</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove Variable (Column)</string>
+   </property>
+   <property name="statusTip">
+    <string>변수삭제</string>
    </property>
   </action>
  </widget>

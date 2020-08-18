@@ -127,3 +127,9 @@ class QueryModel(QAbstractTableModel):
 
     def getRowCount(self):
         return self._row_count
+
+    def getHeaderId(self, index):
+        return self._headers[index]
+
+    def getData(self, index):
+        return str(self._data[index.row()][index.column()])

@@ -281,7 +281,7 @@
               </column>
               <column>
                <property name="text">
-                <string>Description</string>
+                <string>Target Name</string>
                </property>
               </column>
               <column>
@@ -347,7 +347,7 @@
               </column>
               <column>
                <property name="text">
-                <string>Description</string>
+                <string>Target Name</string>
                </property>
               </column>
               <column>

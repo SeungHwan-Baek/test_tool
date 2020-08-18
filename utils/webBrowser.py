@@ -1,7 +1,16 @@
 import os, sys
 import json
+import shutil
+import urllib.request
+
+import re
+import requests
+from bs4 import BeautifulSoup
+import zipfile
+
 from win32com.client import Dispatch
 from utils.config import Config
+from utils.settings import Settings
 
 from utils.lib import makeDataInfo
 from utils.recorder import Recorder
@@ -26,6 +35,10 @@ class WebBrowser(object):
     eventList = []
     browser_log_hst = []
 
+    HOME = os.path.expanduser("~")
+    SAVE_PATH = os.path.join(HOME, 'Test_Tool')
+    HOME_SAVE_PATH = os.path.join(HOME, '.test_tool')
+
     def __init__(self, sid, url=''):
         self.sid = sid
         self.url = url
@@ -36,8 +49,17 @@ class WebBrowser(object):
         self.browser_log = []
         self.browser_log_hst = []
 
+        self.chromedriver_version = ''
+
         self.recording = False
         self.web_iframe_list = []
+
+        # Load setting in the main thread
+        self.settings = Settings(self.HOME_SAVE_PATH)
+        self.settings.load()
+        self.settings.save()
+
+        self._loadSetting()
 
         self.config = Config()
         self.paths = [r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -53,6 +75,15 @@ class WebBrowser(object):
             self.dic_url[self.sid] = self.url
         else:
             print('미존재 SID')
+
+
+    def _loadSetting(self):
+        '''
+        설정값으로 재설정
+        :return: None
+        '''
+        self.chromedriver_version = self.settings.get("CHROMEDRIVER_VERSION", "")
+
 
     def getVersionViaCom(self):
         version_info = []
@@ -130,16 +161,16 @@ class WebBrowser(object):
 
     def popUp(self):
         version = self.getVersionViaCom()
+        chromedriver_path = os.path.join(self.SAVE_PATH, 'chromedriver.exe')
 
-        if version == '81':
-            chromedriver = 'chromedriver_81'
-        elif version == '79':
-            chromedriver = 'chromedriver_79'
-        elif version == '80':
-            chromedriver = 'chromedriver_80'
+        if not os.path.exists(chromedriver_path):
+            print('chromedriver 파일 미존재 - 생성....')
+            self.downloadChromedriver(version, chromedriver_path)
+        elif version == self.chromedriver_version:
+            print('동일한 Chrome / chromedriver 버전')
         else:
-            print('Chrome Version Check : {} - 79, 80, 81 Version만 지원가능'.format(version))
-            return False
+            print('Chrome / chromedriver 버전이 다른 경우')
+            self.downloadChromedriver(version, chromedriver_path)
 
         print(version)
 
@@ -157,7 +188,7 @@ class WebBrowser(object):
         caps['goog:loggingPrefs'] = {'performance': 'ALL'}
 
         # 드라이버 객체 생성
-        self.driver = webdriver.Chrome(chromedriver, chrome_options=chrome_options, desired_capabilities=caps)
+        self.driver = webdriver.Chrome(chromedriver_path, chrome_options=chrome_options, desired_capabilities=caps)
 
         #self.driver.implicitly_wait(3)  # 드라이버 초기화를 위해 3초 대기
         self.get()
@@ -167,14 +198,27 @@ class WebBrowser(object):
 
         if self.sid == 'SWGS':
             try:
-                WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, 'mdi01_subWindow0_iframe')))
+                self.driver.switch_to_alert()
+                alert = WebDriverWait(self.driver, 1).until(EC.alert_is_present())
+                alert.accept()
+            except NoAlertPresentException:
+                pass
             finally:
-                print('Page is ready!')
-                self.driver.execute_script('''top.document.title = "(FOR AUTO TEST TOOL)"''')
-                # Recorder 선언
-                self.recorder = Recorder(self.driver)
-                self.recorder.addEventListener()
-                #threading.Timer(3, self.getBrowserEvents).start()
+                while True:
+                    try:
+                        WebDriverWait(self.driver, 0).until(EC.element_to_be_clickable((By.ID, 'bodyBlock')))
+                    except:
+                        break
+
+                try:
+                    WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, 'mdi01_subWindow0_iframe')))
+                finally:
+                    print('Page is ready!')
+                    self.driver.execute_script('''top.document.title = "(FOR AUTO TEST TOOL)"''')
+                    # Recorder 선언
+                    self.recorder = Recorder(self.driver)
+                    self.recorder.addEventListener()
+                    #threading.Timer(3, self.getBrowserEvents).start()
 
     def getRequest(self):
         try:
@@ -213,8 +257,10 @@ class WebBrowser(object):
 
         print('Request Clear Successful')
 
+
     def clearUiEventList(self):
         self.recorder.clearEventList()
+
 
     def recordUiEvent(self):
         if not self.recording:
@@ -311,7 +357,10 @@ class WebBrowser(object):
         return self.eventList
 
     def getSessionId(self):
-        return self.driver.session_id
+        if self.driver:
+            return self.driver.session_id
+        else:
+            return False
 
     def setSessionId(self, session_id):
         self.driver.session_id = session_id
@@ -327,5 +376,114 @@ class WebBrowser(object):
         self.driver.switch_to_window(self.driver.current_window_handle)
 
 
+    def saveChromedriverVersion(self, version):
+        '''
+        chromedriver version 정보를 저장
+        '''
+        self.settings.load()
+        settings = self.settings
+        settings["CHROMEDRIVER_VERSION"] = version
+        settings.save()
 
 
+    def chromedriverWebOn(self):
+        '''
+        chromedriver site 접속 가능여부 체크
+        '''
+        url = "https://chromedriver.chromi123123um.org/downloads"
+        try:
+            res = urllib.request.urlopen(url)
+
+            if res.status == 200:
+                return True
+            else:
+                return False
+        except:
+            return False
+
+
+    def downloadChromedriver(self, version, chromedriver_path):
+        '''
+        chromedriver가 미존재하거나 버전이 다른 경우 발생하는 이벤트
+            - 온라인 연결이 가능한 경우는 다운로드
+            - 온라인 연결이 불가능한 경우 임시 파일 중 가능한 버전으로 대체
+        :param version: (str) '81'
+        :param chromedriver_path: (str) 'C:\Users\Administrator\Test_Tool'
+        '''
+        if self.chromedriverWebOn():
+            print("Chromedriver Downloading...")
+            download_url  = self.findDriverVersion(version)
+            download_path = os.path.join(self.SAVE_PATH, "chromedriver.zip")
+            urllib.request.urlretrieve(download_url, download_path)
+            print("Download Complete!")
+
+            try:
+                with zipfile.ZipFile(download_path) as zf:
+                    zf.extractall(path=self.SAVE_PATH)
+                os.remove(download_path)
+            except Exception as e:
+                print(e)
+
+        else:
+            print('Online 연결 불가능 - 오프라인 파일 생성')
+
+            try:
+                if version == '81':
+                    shutil.copy('chromedriver_tmp/chromedriver_81.exe', chromedriver_path)
+                    self.saveChromedriverVersion(version)
+                elif version == '79':
+                    shutil.copy('chromedriver_tmp/chromedriver_79.exe', chromedriver_path)
+                    self.saveChromedriverVersion(version)
+                elif version == '80':
+                    shutil.copy('chromedriver_tmp/chromedriver_80.exe', chromedriver_path)
+                    self.saveChromedriverVersion(version)
+                else:
+                    print('Chrome Version Check : {} - 오프라인은 79, 80, 81 Version만 지원가능'.format(version))
+                    return False
+            except:
+                pass
+        pass
+
+
+    def findDriverVersion(self, find_version):
+        '''
+        chromedriver를 다운로드 할 url를 찾아 string으로 Return
+        :param find_version: (str) '81'
+        :return: (str) https://chromedriver.storage.googleapis.com/81.0.4044.138/chromedriver_win32.zip
+        '''
+        download_url = ''
+
+        base_url = "https://chromedriver.chromium.org/downloads"
+
+        base_req = requests.get(base_url)
+        base_soup = BeautifulSoup(base_req.content, "html.parser")
+
+        atags = base_soup.select("a")
+
+        for a in atags:
+            m = re.compile("ChromeDriver (.*)")
+            p = m.search(a.text)
+
+            try:
+                version = p.group(1)
+                try:
+
+                    m = re.compile("(\d*)\..*")
+                    p = m.search(version)
+
+                    if int(find_version) == int(p.group(1)):
+                        download_url = "/".join(
+                            [
+                                "https://chromedriver.storage.googleapis.com",
+                                version,
+                                "chromedriver_win32.zip",
+                            ]
+                        )
+                        break
+
+                except:
+                    pass
+            except AttributeError:
+                pass
+
+        return download_url

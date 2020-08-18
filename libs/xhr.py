@@ -75,6 +75,7 @@ class Xhr(Step):
             - Column ID와 Description을 관리하기 위함
             - (class) Column 을 Dict로 관리 {'input1' : [ (class) Column1,  (class) Column2, ... ]}
             - Column 정보 추가 시 이미 존재하는 경우 Skip
+            - 결과값이 존재하지 않는 Output의 경우 output dataInfo 에서 column값을 찾아 추가함
         :param data: (list) or (dict) [input_data, output_data]
         :return: None
         '''
@@ -92,15 +93,34 @@ class Xhr(Step):
             elif type(data[data_list_id]) == dict:
                 data_list = data[data_list_id]
 
-            for column_id in data_list:
-                column = self.getColumnInfoById(data_list_id, column_id)
+            if data_list:
+                for column_id in data_list:
+                    column = self.getColumnInfoById(data_list_id, column_id)
 
-                if column:
-                    pass
-                else:
-                    column = Column(self)
-                    column['column_id'] = column_id
-                    columns.append(column)
+                    if column:
+                        pass
+                    else:
+                        column = Column(self)
+                        column['column_id'] = column_id
+                        column['variable'] = ''
+                        columns.append(column)
+            else:
+                if self.getDataListType(data_list_id) == 'output':
+                    dataList = list(filter(lambda datalist: datalist['id'] == data_list_id, self.output_data['dataInfo']))
+
+                    if dataList:
+                        output_columns = [column['id'] for column in dataList[0]['columns']['column']]
+
+                        for column_id in output_columns:
+                            column = self.getColumnInfoById(data_list_id, column_id)
+
+                            if column:
+                                pass
+                            else:
+                                column = Column(self)
+                                column['column_id'] = column_id
+                                column['variable'] = ''
+                                columns.append(column)
 
             self.data_column_info[data_list_id] = columns
 
@@ -141,7 +161,14 @@ class Xhr(Step):
             except ValueError:
                 index = -1
 
-            for data in self.input_data[data_list_id]:
+            data_list_type = self.getDataListType(data_list_id)
+
+            if data_list_type == 'input':
+                data_list = self.input_data
+            elif data_list_type == 'output':
+                data_list = self.output_data
+
+            for data in data_list[data_list_id]:
                 data[new_column_id] = ''
 
                 # Column 추가 시 Insert하기 위한 로직
@@ -168,6 +195,7 @@ class Xhr(Step):
             # Column 정보 추가
             column = Column(self)
             column['column_id'] = new_column_id
+            column['variable'] = ''
             self.data_column_info[data_list_id].insert(column_info_index, column)
 
             # Row정보 변경
@@ -324,8 +352,15 @@ class Xhr(Step):
         for column in column_list:
             data[column] = ''
 
+        data_list_type = self.getDataListType(data_list_id)
+
+        if data_list_type == 'input':
+            data_list = self.input_data
+        elif data_list_type == 'output':
+            data_list = self.output_data
+
         for ix in range(0, row_cnt):
-            self.input_data[data_list_id].append(data)
+            data_list[data_list_id].append(data)
 
         # Row정보 변경
         self.setRowInfo()
@@ -480,6 +515,21 @@ class Xhr(Step):
             column_list = []
 
         return column_list
+
+
+    def getColumnCount(self, data_list_id):
+        '''
+        data_list_id에 해당하는 (class) Column 건수를 Return
+        :param data_list_id: (str) 'input1'
+        :return: (int) 3
+        '''
+
+        try:
+            column_list = [column.get('column_id') for column in self.data_column_info[data_list_id]]
+        except KeyError:
+            column_list = []
+
+        return len(column_list)
 
 
     def getColumnInfoById(self, data_list_id, column_id):
@@ -901,6 +951,7 @@ class Xhr(Step):
         '''
         rst = ''
 
+        # Step 기준
         if data_list_id == '':
             for data_list_id in self.input_data:
                 for row_index, row in enumerate(self.data_row_info[data_list_id]):
@@ -912,8 +963,9 @@ class Xhr(Step):
 
                             if variable:
                                 variable_step_id = variable.getStepId()
+                                variable_column_id = variable.get('column_id')
 
-                                if self.getId() == variable_step_id:
+                                if self.getId() == variable_step_id and col == variable_column_id:
                                     rst = 'Link'
                                 else:
                                     rst = 'Unlink'
@@ -930,8 +982,9 @@ class Xhr(Step):
 
                             if variable:
                                 variable_step_id = variable.getStepId()
+                                variable_column_id = variable.get('column_id')
 
-                                if self.getId() == variable_step_id:
+                                if self.getId() == variable_step_id and col == variable_column_id:
                                     rst = 'Link'
                                 else:
                                     rst = 'Unlink'
@@ -950,27 +1003,53 @@ class Xhr(Step):
 
                         if variable:
                             variable_step_id = variable.getStepId()
+                            variable_column_id = variable.get('column_id')
 
-                            if self.getId() == variable_step_id:
+                            if self.getId() == variable_step_id and col == variable_column_id:
                                 rst = 'Link'
                             else:
                                 rst = 'Unlink'
                         else:
                             rst = 'Unlink'
                             return rst
+        # Data Row 기준
         else:
             variable_id = self.getRowInfoValue(data_list_id, row, column_id, 'variable')
             if variable_id:
                 variable = self.case.getVariable(variable_id)
                 if variable:
                     variable_step_id = variable.getStepId()
+                    variable_column_id = variable.get('column_id')
 
-                    if self.getId() == variable_step_id:
+                    if self.getId() == variable_step_id and column_id == variable_column_id:
                         rst = 'Link'
                     else:
                         rst = 'Unlink'
                 else:
                     rst = 'Unlink'
+
+        return rst
+
+    def getIsColVar(self, data_list_id='', column_id=''):
+        '''
+        Column에 Variable가 설정되어 있는지 여부
+            - Tableview에서 노출하기 위함
+        '''
+        rst = ''
+        variable_id = self.getColumnValue(data_list_id, column_id, 'variable')
+
+        if variable_id:
+            variable = self.case.getVariable(variable_id)
+            if variable:
+                variable_step_id = variable.getStepId()
+                variable_column_id = variable.get('column_id')
+
+                if self.getId() == variable_step_id and column_id == variable_column_id:
+                    rst = 'Link'
+                else:
+                    rst = 'Unlink'
+            else:
+                rst = 'Unlink'
 
         return rst
 

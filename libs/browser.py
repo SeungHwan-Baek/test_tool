@@ -18,8 +18,25 @@ class Browser(Step):
             pass
         return state
 
+    def getWeb(self):
+        return self.web
+
+    def setWeb(self, web=None):
+        try:
+            if self.web:
+                pass
+        except AttributeError:
+            self.web = None
+
+        if web:
+            self.web = web
+
     def getDriver(self):
-        return self.web.driver
+        try:
+            return self.web.driver
+        except AttributeError:
+            self.startStep()
+            return self.web.driver
 
     def setDriver(self, driver):
         self.web.driver = driver
@@ -29,8 +46,15 @@ class Browser(Step):
             activity = self.get('activity')
 
             if activity == 'Open Browser':
-                self.web = WebBrowser(sid=self.get('sid'), url=self.get('url'))
-                self.web.popUp()
+                try:
+                    if self.web and self.web.getStatus():
+                        self.web.get()
+                    else:
+                        self.web = WebBrowser(sid=self.get('sid'), url=self.get('url'))
+                        self.web.popUp()
+                except AttributeError:
+                    self.web = WebBrowser(sid=self.get('sid'), url=self.get('url'))
+                    self.web.popUp()
             elif activity == 'Refresh Browser':
                 browser_step_id = self.get('browser_step_id')
                 browser_step = self.case.getStep(step_id=browser_step_id)
@@ -42,6 +66,7 @@ class Browser(Step):
             self.setStatus(1, str(e))
 
     def makeStep(self, driver=None):
+        self.info['group'] = 'Browser 시작'
         self.info['browser_nm'] = 'SWGS'
         self.info['sid'] = 'SWGS'
         self.info['description'] = 'URL 시작 및 탐색'

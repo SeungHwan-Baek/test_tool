@@ -133,7 +133,7 @@ class AutoVariableDialog(QDialog, dig_class):
 
             self.tw_variableObjRowList.setCellWidget(idx, 0, chk_cell_widget)
             self.tw_variableObjRowList.setItem(idx, 1, QTableWidgetItem(step.get('target')))
-            self.tw_variableObjRowList.setItem(idx, 2, QTableWidgetItem(step.get('description')))
+            self.tw_variableObjRowList.setItem(idx, 2, QTableWidgetItem(step.get('target_nm')))
             self.tw_variableObjRowList.setItem(idx, 3, QTableWidgetItem(row.get('data_list_id')))
             self.tw_variableObjRowList.setItem(idx, 4, QTableWidgetItem(row.get('column_id')))
             self.tw_variableObjRowList.setItem(idx, 5, QTableWidgetItem(str(row.get('row_index'))))

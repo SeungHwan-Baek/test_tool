@@ -43,6 +43,7 @@ class AddStepDialog(QDialog, dig_class):
         self.case = case
         self.step = step
         self.group = group
+        self.variables = {}
 
         if step:
             self.index = step.getSeq()
@@ -77,8 +78,17 @@ class AddStepDialog(QDialog, dig_class):
         self.edt_smsText = SmsTextWidget()
         #self.edt_logView.findText.connect(self.setFindText)
         if self.case:
-            variables = self.case.getApplicableVariables(seq=self.index)
-            self.edt_smsText.setAutocompletions(variables)
+            self.variables = self.case.getApplicableVariables(seq=self.index)
+            self.edt_smsText.setAutocompletions(self.variables)
+
+            # Line Edit 자동완성 Setting
+            variable_keys = list(self.variables.keys())
+            completer = QCompleter(variable_keys)
+            completer.setCaseSensitivity(Qt.CaseInsensitive)
+
+            self.edt_ifVariable.setCompleter(completer)
+            self.edt_value.setCompleter(completer)
+            self.edt_bCommandValue.setCompleter(completer)
         self.message_layout.addWidget(self.edt_smsText)
 
 
@@ -285,6 +295,8 @@ class AddStepDialog(QDialog, dig_class):
                 locator = self.step.get('locator')
                 url = self.step.get('url', "")
                 command_target = self.step.get('command_target')
+
+                frame = self.step.get('frame', "")
                 value = self.step.get('value', "")
                 auto_enter = self.step.get('auto_enter', False)
                 wait_sec = self.step.get('wait_sec', 0)
@@ -297,6 +309,7 @@ class AddStepDialog(QDialog, dig_class):
 
                 self.edt_bCommandTarget.setText(command_target)
                 self.edt_bCommandValue.setText(value)
+                self.edt_frame.setText(frame)
                 self.cb_autoEnter.setChecked(auto_enter)
                 self.sb_bCommandWaitSec.setValue(wait_sec)
 
@@ -380,9 +393,9 @@ class AddStepDialog(QDialog, dig_class):
                 self.edt_xhrTarget.setFocus()
                 return False
 
-            if self.edt_description.text() == '':
-                QMessageBox.information(self, "Add Step", "Description을 입력하세요")
-                self.edt_description.setFocus()
+            if self.edt_xhrTargetNm.text() == '':
+                QMessageBox.information(self, "Add Step", "Target명을 입력하세요")
+                self.edt_xhrTargetNm.setFocus()
                 return False
         elif self.step_type == 'Open Browser':
             if self.edt_browserNm.text() == '':
@@ -459,6 +472,7 @@ class AddStepDialog(QDialog, dig_class):
             step['sec'] = self.sp_sec.value()
         elif self.step_type_group == 'Browser':
             step['activity'] = self.step_type
+            step['step_type_group'] = self.step_type_group
 
             if self.step_type == 'Open Browser':
                 step['browser_nm'] = self.edt_browserNm.text()
@@ -478,6 +492,7 @@ class AddStepDialog(QDialog, dig_class):
             browser_step = self.case.findStepByType('Open Browser', key='browser_nm', value=self.cb_browser.currentText())[0]
             step['browser_step_id'] = browser_step.getId()
             step['command'] = self.step_type
+            step['step_type_group'] = self.step_type_group
 
             if self.step_type == 'open':
                 step['description'] = 'URL 이동'
@@ -487,12 +502,14 @@ class AddStepDialog(QDialog, dig_class):
                 step['locator'] = self.cb_by.currentText()
                 step['command_target'] = self.edt_bCommandTarget.text()
                 step['wait_sec'] = self.sb_bCommandWaitSec.value()
+                step['frame'] = self.edt_frame.text()
             elif self.step_type == 'Switch to Default':
                 step['description'] = '부모 창 프레임으로 다시 전환'
             elif self.step_type == 'Execute Script':
                 step['locator'] = self.cb_by.currentText()
                 step['command_target'] = self.edt_bCommandTarget.text()
                 step['wait_sec'] = self.sb_bCommandWaitSec.value()
+                step['frame'] = self.edt_frame.text()
                 step['value'] = self.edt_bCommandValue.text()
             elif self.step_type == 'Alert':
                 step['description'] = '알림창 확인'
@@ -501,6 +518,7 @@ class AddStepDialog(QDialog, dig_class):
                 step['locator'] = self.cb_by.currentText()
                 step['command_target'] = self.edt_bCommandTarget.text()
                 step['wait_sec'] = self.sb_bCommandWaitSec.value()
+                step['frame'] = self.edt_frame.text()
 
                 if self.step_type in ['Type', 'Grid Type', 'Combo Click']:
                     step['value'] = self.edt_bCommandValue.text()

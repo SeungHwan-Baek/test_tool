@@ -19,7 +19,7 @@ class CaseThread(QThread):
     error = False
     worker_id = ''
 
-    def __init__(self, suite, case, start_row=0, worker_id=''):
+    def __init__(self, suite, case, start_row=0, worker_id='', mainWidget=None):
         QThread.__init__(self)
         self.cond = None
         self.mutex = None
@@ -28,6 +28,7 @@ class CaseThread(QThread):
         self.error = False
         self.suite = suite
         self.case = case
+        self.mainWidget = mainWidget
 
         if worker_id == '':
             self.worker_id = str(uuid.uuid4())
@@ -93,7 +94,14 @@ class CaseThread(QThread):
                     if step.getType() == 'XHR':
                         self.case.getMarkingData(self.worker_id, step=step)
 
+                    if step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
+                        if self.mainWidget.getWebStatus:
+                            step.setWeb(self.mainWidget.web)
+
                     step.startStep()
+
+                    if step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
+                        self.mainWidget.web = step.getWeb()
 
                     code = step.getParamsCode()
                     msg = step.getParamsMsg()

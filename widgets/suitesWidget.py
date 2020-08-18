@@ -115,7 +115,7 @@ class SuitesWidget(QWidget, form_class):
         # self.testCase_layout.selected.connect(self.__dataInfoSelected)
         self.testCase_layout.addWidget(self.case_widget)
 
-        self.step_widget = StepWidget(suites=self.suites)
+        self.step_widget = StepWidget(suites=self.suites, parent=self)
         self.step_widget.xhrToDown.connect(self._runXhrToDown)
         self.testStep_layout.addWidget(self.step_widget)
 
@@ -144,8 +144,10 @@ class SuitesWidget(QWidget, form_class):
         self.tw_scheduleList.itemExpanded.connect(self.twScheduleListItemClicked)      # Schedule Item Expanded 이벤트
         self.tw_scheduleList.itemCollapsed.connect(self.twScheduleListItemClicked)     # Schedule Item Collapse 이벤트
 
-        self.action_autoAddTestStep.triggered.connect(self.autoAddTestStep)  # 메뉴 - Auto Add Test Step
-        self.btn_playSuites.clicked.connect(self.btnPlaySuites)              # Play Suites 버튼 클릭 이벤트
+        self.action_autoAddTestStep.triggered.connect(self.autoAddTestStep)            # 메뉴 - Auto Add Test Step
+        self.btn_playSuites.clicked.connect(self.btnPlaySuites)                        # Play Suites 버튼 클릭 이벤트
+
+        self.edt_caseDesc.textChanged.connect(self._caseDescChanged)                   # Play Suites 버튼 클릭 이벤트
 
     # ============================ Case Widget Signal Event ============================
     def _setSelectedCase(self, case):
@@ -319,7 +321,7 @@ class SuitesWidget(QWidget, form_class):
                 step = Xhr(case=self.selected_case, step_type='XHR')
                 step['group'] = group
                 step['target'] = trxCode
-                step['description'] = tx_name
+                step['target_nm'] = tx_name
                 step['error_option'] = 'Stop'
 
                 self.selected_case.setStepList(step)
@@ -335,7 +337,7 @@ class SuitesWidget(QWidget, form_class):
 
         self.step_widget.setStepView()
 
-        QMessageBox.information(self, "Setting Step By Request", "[{add}]건 추가완료, [{excluded}]건 제외".format(excluded=excluded, add=add))
+        QMessageBox.information(self, "Setting Step By Request", "[{add}]건 추가완료, [{excluded}]건 제외".format(excluded=excluded_cnt, add=add))
 
     def setStepByUiEvent(self, ui_event_list, driver):
         group, ok = QInputDialog.getText(self, 'Step grouping', 'Group명을 입력하세요.')
@@ -486,6 +488,15 @@ class SuitesWidget(QWidget, form_class):
             scheduleDialog.popUp()
         else:
             QMessageBox.information(self, "스케줄 추가", "선택된 Case가 없습니다.")
+
+
+    def _caseDescChanged(self):
+        '''
+        Case 설명 변경 시 Case에 자동저장
+        '''
+        if self.selected_case:
+            text = self.edt_caseDesc.toPlainText()
+            self.selected_case.setCaseDesc(text)
 
 
     def btnPlaySuites(self):

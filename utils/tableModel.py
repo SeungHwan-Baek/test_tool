@@ -26,21 +26,18 @@ class PandasModel(QAbstractTableModel):
         self.changedDataIndex.append((a.row(), a.column()))
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        if self.headerIcon:
-            if orientation == Qt.Horizontal:
+        if orientation == Qt.Horizontal:
+            try:
                 col = self._data.columns[section]
 
                 if role == Qt.DecorationRole:
                     header_icon = ''
+                    var = self.step.getIsColVar(self.data_list_id, col)
 
-                    if col in self.fixedList:
-                        header_icon = os.path.join(parentDir, 'UI/icon/nail.png')
-                    elif col in self.dataList:
-                        header_icon = os.path.join(parentDir, 'UI/icon/link.png')
-                    elif col in self.sql:
-                        header_icon = os.path.join(parentDir, 'UI/icon/sql.png')
-                    elif col in self.excel:
-                        header_icon = os.path.join(parentDir, 'UI/icon/excel.png')
+                    if var == 'Link':
+                        header_icon = (':/variable/' + 'var.png')
+                    elif var == 'Unlink':
+                        header_icon = (':/variable/' + 'unvar.png')
 
                     if header_icon:
                         return QVariant(QPixmap(header_icon).scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
@@ -58,6 +55,8 @@ class PandasModel(QAbstractTableModel):
                         tooltip = 'Excel'
 
                     return tooltip
+            except IndexError:
+                pass
 
         if role != Qt.DisplayRole:
             return QVariant()

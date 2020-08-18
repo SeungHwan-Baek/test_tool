@@ -53,6 +53,7 @@ class StepWidget(QMainWindow, widget_class):
         self.selected_data_id = ''
         self.selected_row = -1
         self.selected_column_id = ''
+        self.suitesWidget = parent
 
         self.setupUi(self)
 
@@ -67,6 +68,7 @@ class StepWidget(QMainWindow, widget_class):
     def _loadUiInit(self):
         self.tw_testStep.hideColumn(1)  # Step Seq
         self.tw_testStep.hideColumn(2)  # Step Id
+        self.tw_columnInfo.setColumnWidth(0, 250)
 
         self.splitter_step_data.setSizes([750, 250])
         self.splitter_list_data.setSizes([150, 850])
@@ -121,36 +123,46 @@ class StepWidget(QMainWindow, widget_class):
         self.action_replayXhr.triggered.connect(self._replayXhrClicked)                             # 메뉴 - Replay XHR
         self.action_replayAllXhrToDown.triggered.connect(self.replayAllXhrToDownClicked)            # 메뉴 - Replay All XHR to Down
         self.action_declareVariable.triggered.connect(self._declareVariableClicked)                 # 메뉴 - Declare Variable
-        self.action_removeVariable.triggered.connect(self._removeiableClicked)                      # 메뉴 - Remove Variable
+        self.action_removeVariable.triggered.connect(self._removeVariableClicked)                   # 메뉴 - Remove Variable
+        self.action_declareVariableColumn.triggered.connect(self._declareVariableColumnClicked)     # 메뉴 - Declare Variable (Column)
+        self.action_removeVariableColumn.triggered.connect(self._removeVariableColumnClicked)       # 메뉴 - Remove Variable (Column)
         self.action_setReference.triggered.connect(self._setReferenceClicked)                       # 메뉴 - Set Reference
         self.action_romoveReference.triggered.connect(self._removeReferenceClicked)                 # 메뉴 - Remove Reference
         self.action_getReferenceValue.triggered.connect(self._getReferenceValueClicked)             # 메뉴 - Get Reference Value
         self.action_getTrIOInfo.triggered.connect(self._getTrIOInfo)                                # 메뉴 - Get Transaction IO Info
         self.action_addExclutionTrList.triggered.connect(self._addExclutionTrListClicked)           # 메뉴 - Add to exclusion transaction list
         self.action_group.triggered.connect(self.groupClicked)                                      # 메뉴 - Group
-        self.action_setRefByValue.triggered.connect(self.setRefByValue)                             # 메뉴 - Set Reference By Value
+        self.action_setRefByValue.triggered.connect(lambda: self.setRefByValue(ref_variable='Row')) # 메뉴 - Set Reference By Value
         self.action_copyTestData.triggered.connect(self._copyJsonDataClicked)                       # 메뉴 - Copy to Json
         self.action_transactionLog.triggered.connect(self._transactionLogClicked)                   # 메뉴 - Transaction Log
         self.action_addDataColumn.triggered.connect(self._addDataColumnClicked)                     # 메뉴 - Data Column 추가
         self.action_addDataRow.triggered.connect(self._addDataRowClicked)                           # 메뉴 - Data Row 추가
         self.action_deleteDataColumn.triggered.connect(self._deleteDataColumnClicked)               # 메뉴 - Data Row 삭제
         self.action_deleteDataRow.triggered.connect(self._deleteDataRowClicked)                     # 메뉴 - Data Column 삭제
+        self.action_moveToUp.triggered.connect(self._stepMoveToUp)                                  # 메뉴 - Step 이동 (위)
+        self.action_moveToDown.triggered.connect(self._stepMoveToDown)                              # 메뉴 - Step 이동 (아래)
 
-        # Context Menu 설정
-        self.tw_testStep.customContextMenuRequested.connect(self._setTestStepContextMenu)
-        self.tw_data.customContextMenuRequested.connect(self._setDataContextMenu)
-
-        # Item Change 이벤트
+        # Step View
+        self.tw_testStep.customContextMenuRequested.connect(self._setTestStepContextMenu)           # Step Context Menu 설정
         self.tw_testStep.currentItemChanged.connect(self._twTestStepItemSelectionChanged)           # Step Tree Item Selection Changed 이벤트
+        self.tw_testStep.itemDoubleClicked.connect(self._lwTestStepCellDoubleClicked)               # Step Cell Double Clicked 이벤트
+        self.tw_testStep.dropEvent = self._twStepDroped                                             # Step Row Drop
+
+        # DataList View
         self.tw_dataList.currentItemChanged.connect(self._twDataListItemSelectionChanged)           # Data List Tree Item Selection Changed 이벤트
 
-        # Tree item DoubleClicked 이벤트
-        self.tw_testStep.itemDoubleClicked.connect(self._lwTestStepCellDoubleClicked)               # Test Step Cell Double Clicked 이벤트
+        # Data Dtl View
+        self.tw_data.customContextMenuRequested.connect(self._setDataContextMenu)
         self.tw_data.currentChanged = self._twDataCurrentChanged                                    # Test Step Cell Double Clicked 이벤트
+        self.tw_data_header = self.tw_data.horizontalHeader()
+        self.tw_data_header.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tw_data_header.customContextMenuRequested.connect(self._setDataHeaderContextMenu)
 
-        # Table Drop 이벤트
-        self.tw_testStep.dropEvent = self._twStepDroped                                             # Test Step Row Drop
+        # Column Info View
+        self.tw_columnInfo.cellClicked.connect(self._twColumnInfoClicked)
+        self.tw_columnInfo.customContextMenuRequested.connect(self._setColumnInfoContextMenu)       # Column Info Context Menu 설정
 
+        # Add Info
         self.cb_addInfo.currentIndexChanged['QString'].connect(self._cbAddInfoColumnIdCurrentIndexChanged)
 
 
@@ -207,27 +219,27 @@ class StepWidget(QMainWindow, widget_class):
                         menu.addSeparator()
 
                         if self.selected_step.getType() == 'XHR':
-                            menu.addAction(self.action_addDataList)
-                            dataList_menu = menu.addMenu('Data List')
-                            for dataListId in self.selected_step.getDataListId('input'):
-                                action = QAction(QIcon(':/step/' + 'circle_arrow.png'), dataListId, self)
-                                #action.triggered.connect(partial(self.dataValueDialogPopup, dataListId))
-                                dataList_menu.addAction(action)
-
-                            dataList_menu.addSeparator()
-
-                            for dataListId in self.selected_step.getDataListId('output'):
-                                action = QAction(QIcon(':/step/' + 'circle_arrow.png'), dataListId, self)
-                                #action.triggered.connect(partial(self.dataValueDialogPopup, dataListId))
-                                dataList_menu.addAction(action)
-
-                            menu.addAction(self.action_getTrIOInfo)
-                            menu.addAction(self.action_copyTestData)
-                            menu.addSeparator()
                             menu.addAction(self.action_addExclutionTrList)
+                            menu.addSeparator()
+                            menu.addAction(self.action_addDataList)
+                            # dataList_menu = menu.addMenu('Data List')
+                            # for dataListId in self.selected_step.getDataListId('input'):
+                            #     action = QAction(QIcon(':/step/' + 'circle_arrow.png'), dataListId, self)
+                            #     #action.triggered.connect(partial(self.dataValueDialogPopup, dataListId))
+                            #     dataList_menu.addAction(action)
+                            #
+                            # dataList_menu.addSeparator()
+
+                            # for dataListId in self.selected_step.getDataListId('output'):
+                            #     action = QAction(QIcon(':/step/' + 'circle_arrow.png'), dataListId, self)
+                            #     #action.triggered.connect(partial(self.dataValueDialogPopup, dataListId))
+                            #     dataList_menu.addAction(action)
+                            menu.addAction(self.action_copyTestData)
+                            menu.addAction(self.action_getTrIOInfo)
                             menu.addSeparator()
                         menu.addAction(self.action_replayXhr)
                         menu.addAction(self.action_replayAllXhrToDown)
+                        menu.addSeparator()
                         menu.addAction(self.action_transactionLog)
 
                         menu.exec_(self.tw_testStep.mapToGlobal(pos))
@@ -256,9 +268,10 @@ class StepWidget(QMainWindow, widget_class):
             menu.addAction(self.action_declareVariable)
             menu.addAction(self.action_setRefByValue)
 
+            if isVar:
+                menu.addAction(self.action_removeVariable)
+
             if data_list_type == 'input':
-                if isVar:
-                    menu.addAction(self.action_removeVariable)
 
                 menu.addSeparator()
                 menu.addAction(self.action_setReference)
@@ -277,6 +290,40 @@ class StepWidget(QMainWindow, widget_class):
                 column_menu.addAction(self.action_addDataColumn)
                 column_menu.addAction(self.action_deleteDataColumn)
             menu.exec_(self.tw_data.mapToGlobal(pos))
+
+
+    def _setDataHeaderContextMenu(self, pos):
+        self.column_pos = pos
+        
+        index = self.tw_data.indexAt(self.column_pos)
+        column = index.column()
+        col_id = self.data_model.getHeader(column)
+        
+        isVar = self.selected_step.getIsColVar(self.selected_data_id, col_id)
+        
+        menu = QMenu()
+        menu.addAction(self.action_declareVariableColumn)
+        
+        if isVar:
+            menu.addAction(self.action_removeVariableColumn)
+        
+        menu.exec_(self.tw_data_header.mapToGlobal(pos))
+
+
+    def _setColumnInfoContextMenu(self, pos):
+        row = self.tw_columnInfo.currentRow()
+        item = self.tw_columnInfo.item(row, 0)
+        col_id = item.text()
+
+        isVar = self.selected_step.getIsColVar(self.selected_data_id, col_id)
+
+        menu = QMenu()
+        menu.addAction(self.action_declareVariableColumn)
+
+        if isVar:
+            menu.addAction(self.action_removeVariableColumn)
+
+        menu.exec_(self.tw_data_header.mapToGlobal(pos))
 
 
     def setComponetEnable(self):
@@ -302,8 +349,8 @@ class StepWidget(QMainWindow, widget_class):
         self.action_removeStep.setEnabled(isStep)
         self.action_copyTestData.setEnabled(isStep)
         self.action_addExclutionTrList.setEnabled(isStep)
-        self.action_moveToUp.setEnabled(isStep)
-        self.action_moveToDown.setEnabled(isStep)
+        # self.action_moveToUp.setEnabled(isStep)
+        # self.action_moveToDown.setEnabled(isStep)
         self.action_replayXhr.setEnabled(isStep)
         self.action_transactionLog.setEnabled(isStep)
 
@@ -540,7 +587,7 @@ class StepWidget(QMainWindow, widget_class):
         declareVariableDialog.popUp(variable_type='Data List', target=target, sub_id=sub_id, row_index=row_index, col_id=col_id, col_desc=col_desc, value=value)
 
 
-    def _removeiableClicked(self):
+    def _removeVariableClicked(self):
         case = self.suites.selectedCase()
         index = self.tw_data.currentIndex()
         row = index.row()
@@ -571,6 +618,70 @@ class StepWidget(QMainWindow, widget_class):
 
             if reply == QMessageBox.Yes:
                 self.selected_step.setRowInfoValue(self.selected_data_id, row, column_id, 'variable', '')
+                self.setDataDtlView()
+                QMessageBox.information(self, __appname__, "삭제되었습니다.")
+
+
+    def _declareVariableColumnClicked(self):
+        if self.tab_dataDtl.currentIndex() == 0:
+            index = self.tw_data.indexAt(self.column_pos)
+            row = index.row()
+            column = index.column()
+            col_id = self.data_model.getHeader(column)
+        else:
+            row = self.tw_columnInfo.currentRow()
+            item = self.tw_columnInfo.item(row, 0)
+            col_id = item.text()
+
+        case = self.suites.selectedCase()
+        target = self.selected_step
+        sub_id = self.selected_data_id
+        row_index = self.selected_row
+        col_desc = self.selected_step.getColumnValue(self.selected_data_id, col_id, 'description')
+        value = self.data_model.getData(self.tw_data.currentIndex())
+
+        declareVariableDialog = DeclareVariableDialog(case)
+        declareVariableDialog.declared.connect(self._columnDeclaredVariable)
+        declareVariableDialog.popUp(variable_type='Data List', target=target, sub_id=sub_id, row_index=row_index, col_id=col_id, col_desc=col_desc, value=value)
+
+
+    def _removeVariableColumnClicked(self):
+        if self.tab_dataDtl.currentIndex() == 0:
+            index = self.tw_data.indexAt(self.column_pos)
+            row = index.row()
+            column = index.column()
+            column_id = self.data_model.getHeader(column)
+        else:
+            row = self.tw_columnInfo.currentRow()
+            item = self.tw_columnInfo.item(row, 0)
+            column_id = item.text()
+
+        case = self.suites.selectedCase()
+        variable_id = self.selected_step.getColumnValue(self.selected_data_id, column_id, 'variable')
+
+        isVar = self.selected_step.getIsColVar(self.selected_data_id, column_id)
+
+        if isVar == 'Link':
+            reply = QMessageBox.question(self, __appname__, "[{}] 변수를 참조하고 있는 경우 삭제 후 참조가 불가능합니다. 변수를 삭제하시겠습니까?".format(variable_id), QMessageBox.Yes, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                case.removeVariable(variable_id)
+                ref_count = case.setStepRefByVariableId('', variable_id, False)
+
+                if ref_count > 0:
+                    reply = QMessageBox.question(self, __appname__, "변수가 삭제되었습니다.\n기존 변수ID를 참조하고 있는 Step [{}]건의 정보도 변경하시겠습니까?".format(ref_count), QMessageBox.Yes, QMessageBox.No)
+
+                    if reply == QMessageBox.Yes:
+                        ref_apply_count = case.setStepRefByVariableId('', variable_id, True)
+                        QMessageBox.information(self, __appname__, "Step [{}]건 적용되었습니다.".format(ref_apply_count))
+
+                self.selected_step.setColumnValue(self.selected_data_id, column_id, 'variable', '')
+                self.setStepView()
+        elif isVar == 'Unlink':
+            reply = QMessageBox.question(self, __appname__, "변수정보를 삭제하시겠습니까?", QMessageBox.Yes, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                self.selected_step.setColumnValue(self.selected_data_id, column_id, 'variable', '')
                 self.setDataDtlView()
                 QMessageBox.information(self, __appname__, "삭제되었습니다.")
 
@@ -617,7 +728,7 @@ class StepWidget(QMainWindow, widget_class):
         :return: None
         '''
         if self.selected_step.getTrIO():
-            reply = QMessageBox.question(self, 'Get Transaction IO Info',"Transaction IO 정보를 Merge 하시겠습니까?",QMessageBox.Yes, QMessageBox.No)
+            reply = QMessageBox.question(self, 'Get Transaction IO Info',"Transaction IO 정보를 변경하시겠습니까?",QMessageBox.Yes, QMessageBox.No)
 
             if reply == QMessageBox.Yes:
                 items = ("CHANGE", "MERGE")
@@ -738,12 +849,16 @@ class StepWidget(QMainWindow, widget_class):
         Data Row 추가
         :return: None
         '''
+        column_count = self.selected_step.getColumnCount(self.selected_data_id)
 
-        new_row_count, ok = QInputDialog.getInt(self, 'Row 추가', '추가할 Row Count를 입력하세요', 1, 1, 100, 1)
+        if column_count > 0 :
+            new_row_count, ok = QInputDialog.getInt(self, 'Row 추가', '추가할 Row Count를 입력하세요', 1, 1, 100, 1)
 
-        if ok and new_row_count:
-            self.changeConfirmDialog.addRowPopUp(self.selected_step, self.selected_data_id, new_row_count)
-            self.setDataDtlView()
+            if ok and new_row_count:
+                self.changeConfirmDialog.addRowPopUp(self.selected_step, self.selected_data_id, new_row_count)
+                self.setDataDtlView()
+        else:
+            QMessageBox.information(self, "Row 추가", "DataList에 존재하는 Column이 없습니다.\nColumn추가 후 Row추가 가능합니다.")
 
 
     def _deleteDataRowClicked(self):
@@ -770,7 +885,23 @@ class StepWidget(QMainWindow, widget_class):
             self.setDataDtlView()
 
 
-    def setRefByValue(self):
+    def _stepMoveToUp(self):
+        '''
+        Step을 위로 이동
+        '''
+        sort_step_list = self.getSelectedSteps()
+        self.stepMoveTo(sort_step_list, increase=-1)
+
+
+    def _stepMoveToDown(self):
+        '''
+        Step을 아래로 이동
+        '''
+        sort_step_list = self.getSelectedSteps(reverse=True)
+        self.stepMoveTo(sort_step_list, increase=1)
+
+
+    def setRefByValue(self, ref_variable='Row'):
         '''
         현재 값 기준으로 동일한 값을 가진 Row의 참조 정보를 해당 변수로 변경함
             - 참조 정보로 사용되기 위해선 사전에 변수로 선언되어 있어야함
@@ -785,7 +916,10 @@ class StepWidget(QMainWindow, widget_class):
             find_value = self.data_model.getData(index)
             column_id = self.data_model.getHeader(column)
 
-        variable = self.selected_step.getRowInfoValue(self.selected_data_id, row, column_id, 'variable')
+        if ref_variable == 'Row':
+            variable = self.selected_step.getRowInfoValue(self.selected_data_id, row, column_id, 'variable')
+        elif ref_variable == 'Column':
+            variable = self.selected_step.getColumnValue(self.selected_data_id, column_id, 'variable')
 
         if variable:
             if find_value:
@@ -828,6 +962,10 @@ class StepWidget(QMainWindow, widget_class):
                 QMessageBox.information(self, "Replay Step", "참조값을 확인하세요.")
                 return False
 
+            if self.selected_step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
+                if self.suitesWidget.mainWidget.getWebStatus:
+                    self.selected_step.setWeb(self.suitesWidget.mainWidget.web)
+
             self.eventWorker = EventThread(self.selected_step.startStep)
             self.eventWorker.finished.connect(self.replayXhrFinished)
             self.eventWorker.start()
@@ -841,6 +979,9 @@ class StepWidget(QMainWindow, widget_class):
         self.xhrToDown.emit(index)
 
     def replayXhrFinished(self):
+        if self.selected_step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
+            self.suitesWidget.mainWidget.web = self.selected_step.getWeb()
+
         add_info_type = self.cb_addInfo.currentText()
 
         stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem(), 0)
@@ -921,7 +1062,7 @@ class StepWidget(QMainWindow, widget_class):
     def _twDataCurrentChanged(self, current, previous):
         '''
         data dtl view column 변경 이벤트
-            - column 변경 시 data dtl view, property view를 갱신
+            - column 변경 시 data dtl view, property view, column Info view를 갱신
         :param current:
         :param previous:
         :return:
@@ -933,10 +1074,24 @@ class StepWidget(QMainWindow, widget_class):
             self.selected_row = row
             self.selected_column_id = self.data_model.getHeader(col)
             self.setPropertyView()
+            self.setColumnInfoRow(col)
             self.tw_data.scrollTo(self.data_model.index(row, col))
         else:
             self.selected_row = row
             self.selected_column_id = ''
+
+
+    def _twColumnInfoClicked(self, row, col):
+        '''
+        Column Info Click 이벤트
+            - selected_column_id 변경하고 property view 갱신
+        '''
+        self.tw_data.clearSelection()
+        item = self.tw_columnInfo.item(row, 0)
+        self.selected_column_id = item.text()
+        #self.selected_row = -1
+        self.setPropertyView()
+        self.setDataDtlCurrnetRow(0, row)
 
 
     def _twStepDroped(self, event):
@@ -1083,11 +1238,24 @@ class StepWidget(QMainWindow, widget_class):
         '''
         self.selected_step.setRowInfoValue(self.selected_data_id, self.selected_row, self.selected_column_id, 'variable', variable_id)
         self.setPropertyView()
-        self.setRefByValue()
+        self.setRefByValue(ref_variable='Row')
 
         self.setStepView()
         #stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem(), 0)
         #stepWidget.setVarChkRst()
+
+
+    def _columnDeclaredVariable(self, variable_id):
+        '''
+        DeclareVariabldDialog를 통해 변수로 등록된 경우 발생되는 이벤트
+            - Column Info에 variable 정보를 Setting하고 property view를 갱신
+        :return: None
+        '''
+        self.selected_step.setColumnValue(self.selected_data_id, self.selected_column_id, 'variable', variable_id)
+        self.setPropertyView()
+        self.setRefByValue(ref_variable='Column')
+
+        self.setStepView()
 
 
     def _applyRefVariable(self, variable_id, ref_option_info):
@@ -1148,6 +1316,12 @@ class StepWidget(QMainWindow, widget_class):
             else:
                 self.changeConfirmDialog.changeColumnDescPopUp(self.selected_step, data_list_id=self.selected_data_id, column_id=column_id, bef_desc=bef_desc, atf_desc=atf_desc, column_component=column_desc)
 
+    def _columnDescClicked(self, row, event):
+        '''
+        Column Info QLine Editor 변경 시 발생 이벤트
+            - Column Info Table Widget Row를 변경
+        '''
+        self.tw_columnInfo.setCurrentCell(row, 0)
 
     def _stepColumnChanged(self, cnt):
         QMessageBox.information(self, "Successful", "[{}] 건 적용되었습니다.".format(cnt))
@@ -1319,6 +1493,7 @@ class StepWidget(QMainWindow, widget_class):
         self.tw_groupReference.clearContents()
 
         self.tw_columnInfo.clearContents()
+        self.tw_columnInfo.setRowCount(0)
 
         if self.selected_step is None:
             case = self.suites.selectedCase()
@@ -1368,9 +1543,17 @@ class StepWidget(QMainWindow, widget_class):
                 for idx, column_id in enumerate(column_info):
                     desc_item = QLineEdit(column_info[column_id])
                     desc_item.editingFinished.connect(partial(self._columnDescChanged, column_id))
+                    desc_item.focusInEvent = partial(self._columnDescClicked, idx)
                     desc_item_cell_widget = horizontalLayout([desc_item])
 
-                    self.tw_columnInfo.setItem(idx, 0, QTableWidgetItem(column_id))
+                    isVar = self.selected_step.getIsColVar(self.selected_data_id, column_id)
+
+                    if isVar:
+                        column_item = QTableWidgetItem(QIcon(':/variable/' + 'var.png'), column_id)
+                    else:
+                        column_item = QTableWidgetItem(column_id)
+
+                    self.tw_columnInfo.setItem(idx, 0, column_item)
                     self.tw_columnInfo.setCellWidget(idx, 1, desc_item_cell_widget)
                     #self.tw_columnInfo.setItem(idx, 1, QTableWidgetItem(column_info[column_id]))
             else:
@@ -1455,6 +1638,14 @@ class StepWidget(QMainWindow, widget_class):
                 labelWidget.setStyleSheet("background-color: rgba(0,0,0,0%)")
                 self.tw_property.setItemWidget(column_desc, 1, labelWidget)
 
+                variable = self.selected_step.getColumnValue(self.selected_data_id, self.selected_column_id, 'variable')
+                column_variable = QTreeWidgetItem(column_info_root_item)
+                column_variable.setText(0, "variable")
+                labelWidget = QLabel(variable)
+                labelWidget.setStyleSheet("background-color: rgba(0,0,0,0%)")
+                labelWidget.setText("<h4><font color='{color}'> {text} </font></h4>".format(color='SandyBrown', text=variable))
+                self.tw_property.setItemWidget(column_variable, 1, labelWidget)
+
             # Row Info
             if self.selected_row > -1:
                 row_info_root_item = QTreeWidgetItem(self.tw_property)
@@ -1496,6 +1687,112 @@ class StepWidget(QMainWindow, widget_class):
             self.tw_property.expandToDepth(0)
 
 
+    def stepMoveTo(self, step_list, increase=-1):
+        '''
+        Step Tree Widget에서 이동
+            - case step list에서 순서 변경
+            - step의 seq 변경
+            - step 위로 이동하거나 아래로 이동 시 호출
+        :param step_list: [(class) step1, (class) step2, ...]
+        :param increase: (int) -1
+        :return: None
+        '''
+        stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem(), 0)
+        case = self.suites.selectedCase()
+
+        if stepWidget:
+            for step in step_list:
+                from_index = case.getStepIndex(step)
+                to_index = from_index + increase
+
+                if from_index == 0 or to_index == case.getStepCount():
+                    pass
+                else:
+                    from_step = case.getStep(from_index)
+                    to_step = case.getStep(to_index)
+
+                    if from_step.getGroup() == to_step.getGroup():
+                        from_step = case.stepList.pop(from_index)
+                        from_step.setSeq(to_index)
+                        to_step.setSeq(from_index)
+                        from_step['group'] = to_step.getGroup()
+                        case.stepList.insert(to_index, from_step)
+                    else:
+                        from_step['group'] = to_step.getGroup()
+                        case.setSelectedStepRow(from_index)
+
+            self.setStepView()
+
+            for step in step_list:
+                selected_stepWidget = self.getStepWidget(step)
+                selected_stepWidget.setSelected(True)
+        else:
+            group_step_list = []
+            for idx in range(0, self.tw_testStep.currentItem().childCount()):
+                child_stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem().child(idx), 0)
+                child_step = child_stepWidget.getStep()
+                group_step_list.append(child_step)
+
+            first_step_index = case.getStepIndex(group_step_list[0])
+            last_step_index = case.getStepIndex(group_step_list[-1])
+
+            '''
+            이동하는 Group의 가장 처음의 Step Index 앞으로 이동
+            '''
+            if increase > 0:
+                to_step_index = last_step_index + increase
+            else:
+                to_step_index = first_step_index + increase
+
+            if to_step_index == case.getStepCount():
+                pass
+            else:
+                to_step = case.getStep(to_step_index)
+                to_step_group = to_step.getGroup()
+                to_step_first_index = case.findStepIndexByGroup(to_step_group)
+
+                for step in reversed(group_step_list):
+                    step_index = case.getStepIndex(step)
+                    pop_step = case.stepList.pop(step_index)
+                    case.stepList.insert(to_step_first_index, pop_step)
+
+                self.setStepView()
+                currentItem = self.tw_testStep.findItems(group_step_list[0].getGroup(), Qt.MatchExactly | Qt.MatchRecursive, column=0)
+                self.tw_testStep.setCurrentItem(currentItem[0])
+
+
+    def getStepWidget(self, step):
+        '''
+        Step id로 TreeWidget을 찾아 Return
+        :param step: (class) step
+        :return: QWidget
+        '''
+        stepWidgetItem = self.tw_testStep.findItems(step.getId(), Qt.MatchExactly | Qt.MatchRecursive, column=2)
+        return stepWidgetItem[0]
+
+
+    def getSelectedSteps(self, reverse=False):
+        '''
+        현재 선택된 Step을 List로 Return
+        :return: (list) [(class) step1, (class) step2, ...]
+        '''
+        selected_step_list = []
+        selectedStepItems = self.tw_testStep.selectedItems()
+
+        for item in selectedStepItems:
+            stepWidget = self.tw_testStep.itemWidget(item, 0)
+
+            if stepWidget is None:
+                pass
+            else:
+                step = stepWidget.getStep()
+                selected_step_list.append(step)
+
+        selected_step_list = sorted(selected_step_list, key=lambda step: (step.getSeq()), reverse=reverse)
+
+        return selected_step_list
+
+
     def setTestStepCurrnetRow(self, row):
         '''
         Step TreeWidget row 로 Focus
@@ -1534,6 +1831,20 @@ class StepWidget(QMainWindow, widget_class):
 
         index = self.data_model.index(row_index, column_index)
         self.tw_data.setCurrentIndex(index)
+
+
+    def setColumnInfoRow(self, row):
+        '''
+        Column Info Table의 row에 Focus
+        :param row: (int) 0
+        '''
+        if type(row) == str:
+            column_list = self.selected_step.getColumnList(self.selected_data_id)
+            row_index = column_list.index(row)
+        elif type(row) == int:
+            row_index = row
+
+        self.tw_columnInfo.setCurrentCell(row_index, 0)
 
 
     def _checkbox_change(self):

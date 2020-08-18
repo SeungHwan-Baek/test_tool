@@ -602,7 +602,7 @@ class CaseWidget(QWidget, widget_class):
 
             self.run.emit()
 
-            self.caseWorker = CaseThread(self.suites, self.selected_case, index, self.worker_id)
+            self.caseWorker = CaseThread(self.suites, self.selected_case, index, self.worker_id, self.suitesWidget.mainWidget)
             self.caseWorker.send_start_step_signal.connect(self.getCaseStepStartSignal)
             self.caseWorker.send_end_step_signal.connect(self.getCaseStepEndSignal)
             self.caseWorker.send_start_get_variable.connect(self.getCaseVariableStart)

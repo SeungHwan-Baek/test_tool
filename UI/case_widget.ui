@@ -140,13 +140,13 @@ Case</string>
      <normaloff>:/case/add_case.png</normaloff>:/case/add_case.png</iconset>
    </property>
    <property name="text">
-    <string>New Test Case</string>
+    <string>Case 생성</string>
    </property>
    <property name="toolTip">
-    <string>New Test Case</string>
+    <string>Case 생성</string>
    </property>
    <property name="statusTip">
-    <string>New Test Case</string>
+    <string>Case 생성</string>
    </property>
   </action>
   <action name="action_openTestCase">

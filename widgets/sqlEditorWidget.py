@@ -49,10 +49,14 @@ class SqlEditorWidget(QWidget, dig_class):
         #self.sqlBindDialog = SqlBindDialog()
 
         # ToolBar 버튼 이벤트
-        self.action_connectDialog.triggered.connect(self._connectDialogClicked)          # 메뉴 - Connect 버튼
+        self.action_connectDialog.triggered.connect(self._connectDialogClicked)           # 메뉴 - Connect 버튼
         self.action_queryTest.triggered.connect(self._executeClicked)                     # 메뉴 - Run Cursor 버튼
         self.tw_bind.itemChanged.connect(self._twBindCurrentItemChanged)
         self.tw_output.itemChanged.connect(self._twOutputCurrentItemChanged)
+
+        self.tw_sqlResult.doubleClicked.connect(self._sqlResultItemDoubleClicked)
+        self.tw_sqlResult_header = self.tw_sqlResult.horizontalHeader()
+        self.tw_sqlResult_header.sectionDoubleClicked.connect(self._sqlResultSectionDoubleClicked)
 
 
     def _loadUiInit(self):
@@ -86,7 +90,7 @@ class SqlEditorWidget(QWidget, dig_class):
         # SQL Editor Setting
         self.query_text_widget = SqlTextWidget()
         self.query_text_widget.textChanged.connect(self._queryTextChanged)  # SQL Text Changed 이벤트
-        self.query_text_widget.setText('SELECT * \n FROM customers \n WHERE customerID = :iparam1')
+        self.query_text_widget.setText('SELECT * \n FROM zord_svc')
 
         self.sa_query.setWidget(self.query_text_widget)
 
@@ -249,7 +253,7 @@ class SqlEditorWidget(QWidget, dig_class):
     def _twOutputCurrentItemChanged(self, item):
         '''
         output TableWidget 값 변경 시 발생 이벤트
-        :return:
+        :return: None
         '''
         if item:
             col = item.column()
@@ -263,6 +267,36 @@ class SqlEditorWidget(QWidget, dig_class):
             self.query.setOutputInfo(output_info_list)
 
             self.queryChanged.emit(self.query)
+
+
+    def _sqlResultItemDoubleClicked(self, index):
+        '''
+        Sql Result Table View Double Click 이벤트
+            - Text에 선택한 Table 값을 추가
+            - Cursor Position 변경
+        :param index: QModelIndex
+        :return: None
+        '''
+        value = self.model.getData(index)
+        pos = self.query_text_widget.getCursorPosition()
+        self.query_text_widget.insertAt(value, pos[0], pos[1])
+        self.query_text_widget.setCursorPosition(pos[0], pos[1] + len(value))
+        self.query_text_widget.setFocus()
+
+
+    def _sqlResultSectionDoubleClicked(self, col):
+        '''
+        Sql Result Table View Head Double Click 이벤트
+            - Text에 선택한 Head Id를 추가
+            - Cursor Position 변경
+        :param col: (int) 3
+        :return: None
+        '''
+        header_id = self.model.getHeaderId(col)
+        pos = self.query_text_widget.getCursorPosition()
+        self.query_text_widget.insertAt(header_id, pos[0], pos[1])
+        self.query_text_widget.setCursorPosition(pos[0], pos[1] + len(header_id))
+        self.query_text_widget.setFocus()
 
 
     def cbSessionCurrentIndexChanged(self, index):

@@ -121,7 +121,17 @@ class MainWindow(QMainWindow, form_class):
         self.tw_recentSuitesList.setColumnWidth(0, 200)
         self.tw_recentSuitesList.setColumnWidth(1, 300)
         self.tw_recentSuitesList.hideColumn(3)                                          # file path
-    
+
+        # tabBar = self.tab_main.tabBar()
+        # menu = QMenu()
+        # menu.addAction(self.action_newSuites)
+        # menuButton = QToolButton()
+        # menuButton.setArrowType(Qt.DownArrow)
+        # menuButton.setMenu(menu)
+        # menuButton.setToolButtonStyle(Qt.ToolButtonFollowStyle)
+        # tabBar.setTabButton(0, QTabBar.LeftSide, menuButton)
+
+
     
     def _setEvent(self):
         '''
@@ -444,6 +454,16 @@ class MainWindow(QMainWindow, form_class):
         suites = suites_widget.getSuites()
         self.refDataDialog = RefDataDialog(suites, self.web)
         self.refDataDialog.popUp()
+
+    def getWebStatus(self):
+        '''
+        현재 유효한 Web Browser 존재여부
+        :return: (bool) True
+        '''
+        if self.web:
+            return self.web.getStatus()
+        else:
+            return False
 
 
     def startSwingClicked(self):

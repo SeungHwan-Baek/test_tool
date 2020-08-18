@@ -49,6 +49,7 @@
     <file>variable.png</file>
   </qresource>
   <qresource prefix="step">
+    <file>log_editor.png</file>
     <file>apply.png</file>
     <file>delete_data_column.png</file>
     <file>delete_data_row.png</file>

@@ -25,6 +25,16 @@ class Recorder:
         top.parent.add_event = function(e) {
         //debugger;
         
+        var ifs = window.top.document.getElementsByTagName("iframe");
+        var iframe_id = 'top'
+        
+        for(var i = 0, len = ifs.length; i < len; i++)  {
+            var f = ifs[i];
+            if(e.target.ownerDocument === ifs[i].contentDocument)   {
+                iframe_id = ifs[i].id
+            }
+        }
+    
         var element_target_type = '';
         var event_type = e.type.charAt(0).toUpperCase() + e.type.slice(1);
         var element = e.target;
@@ -54,7 +64,7 @@ class Recorder:
                 element_id = element_id.replace('___input', '');
             }
         }
-        else if (['button'].indexOf(element_type) > -1 || ['A', 'IMG'].indexOf(element_tag) > -1){
+        else if (['button', 'checkbox'].indexOf(element_type) > -1 || ['A', 'IMG'].indexOf(element_tag) > -1){
             if (element.parentElement.getAttribute('role') == 'gridcell'){
                 element_target_type = 'Grid';
                 event_type = element_target_type + ' ' + event_type ;
@@ -105,7 +115,13 @@ class Recorder:
         
         if (e.type == 'click') {
             if (['DIV', 'group', 'HTML', 'FONT', 'TBODY'].indexOf(e.target.tagName) > -1 ){
-                ;
+                if (['wfm_findLayer_gen_items'].indexOf(e.target.parentElement.id) > -1 ){
+                    element_option['auto_enter']='True'
+                    top.parent._events.push([+new Date(), 'Type', 'Input', 'wfm_findLayer_edt_keyword', 'top', e.target.textContent, element_option]);
+                }
+                else {
+                    ;
+                }
             }
             else if (['TD', 'TR', 'TH', 'H3'].indexOf(e.target.tagName) > -1 && e.target.getAttribute('role') == null){
                 ;
@@ -115,7 +131,7 @@ class Recorder:
             }
             else
             {
-                top.parent._events.push([+new Date(), event_type, element_target_type, element_id, element_value, element_option]);
+                top.parent._events.push([+new Date(), event_type, element_target_type, element_id, iframe_id, element_value, element_option]);
             }
         }
         else if (e.type == 'keyup') {
@@ -140,11 +156,11 @@ class Recorder:
     
                 if (e.key == 'Enter'){
                     element_option['auto_enter']='True'
-                    top.parent._events.push([+new Date(), 'Type', element_target_type, element_id, element_value, element_option]);
+                    top.parent._events.push([+new Date(), 'Type', element_target_type, element_id, iframe_id, element_value, element_option]);
                 }
                 else{
                     element_option['auto_enter']='False'
-                    top.parent._events.push([+new Date(), 'Type', element_target_type, element_id, element_value, element_option]);
+                    top.parent._events.push([+new Date(), 'Type', element_target_type, element_id, iframe_id, element_value, element_option]);
                 }
             }
             else if (['Grid'].indexOf(element_target_type) > -1){
@@ -167,7 +183,7 @@ class Recorder:
                 }
                 top.parent._events.splice(0, remove_cnt);
                 top.parent._events.reverse();
-                top.parent._events.push([+new Date(), 'Grid Type', 'Grid', element_id, element_value, element_option]);
+                top.parent._events.push([+new Date(), 'Grid Type', 'Grid', element_id, iframe_id, element_value, element_option]);
             }
         }
         else if (e.type == 'focusout') {
@@ -196,7 +212,7 @@ class Recorder:
                 top.parent._events.splice(0, remove_cnt);
                 top.parent._events.reverse();
                 
-                top.parent._events.push([+new Date(), 'Grid Double Click', element_target_type, element_id, element_value, element_option]);
+                top.parent._events.push([+new Date(), 'Grid Double Click', element_target_type, element_id, iframe_id, element_value, element_option]);
             }
         }
     };''')
@@ -243,7 +259,7 @@ class Recorder:
                 ;
             }
             else{
-                temp_confirm = temp_confirm.replace('c=window.confirm(a);', "c=window.confirm(a); if (c == true) {top.parent._events.push([+new Date(), 'Alert', 'Confirm', 'window_confirm', 'Accept', {}]);} else {top.parent._events.push([+new Date(), 'dismiss', 'Confirm', 'window_confirm', 'Dismiss', {}]);}")
+                temp_confirm = temp_confirm.replace('c=window.confirm(a);', "c=window.confirm(a); if (c == true) {top.parent._events.push([+new Date(), 'Alert', 'Confirm', 'window_confirm', '', 'Accept', {}]);} else {top.parent._events.push([+new Date(), 'Alert', 'Confirm', 'window_confirm', '', 'Dismiss', {}]);}")
                 temp_confirm = temp_confirm.replace("function", "ngmf.confirm = function")
                 eval(temp_confirm)
             }     
@@ -257,7 +273,7 @@ class Recorder:
                 ;
             }
             else{
-                temp_alert = temp_alert.replace("else b()", "else { b(); } top.parent._events.push([+new Date(), 'Alert', 'Alert', 'window_alert', 'Accept', {}]);")
+                temp_alert = temp_alert.replace("else b()", "else { b(); } top.parent._events.push([+new Date(), 'Alert', 'Alert', 'window_alert', '', 'Accept', {}]);")
                 temp_alert = temp_alert.replace("function", "ngmf.alert = function")
                 eval(temp_alert)
             }
@@ -288,8 +304,12 @@ class Recorder:
                 iframe_id = iframe.get_attribute('id')
 
                 if iframe_id:
-                    #print(iframe_id)
-                    WebDriverWait(self.driver, 0).until(EC.frame_to_be_available_and_switch_to_it((By.ID, iframe_id)))
+                    print(iframe_id)
+                    WebDriverWait(self.driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.ID, iframe_id)))
+                    try:
+                        self.driver.execute_script("$('.cont_wrap').css('background', 'pink')")
+                    except:
+                        pass
                     self.addEventListener(iframe_id)
                     self.driver.switch_to.parent_frame()
 

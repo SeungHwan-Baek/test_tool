@@ -24,6 +24,16 @@ class BrowserCommand(Step):
             pass
         return state
 
+    def getWeb(self):
+        browser_step_id = self.get('browser_step_id')
+        browser_step = self.case.getStep(step_id=browser_step_id)
+        return browser_step.getWeb()
+
+    def setWeb(self, web):
+        browser_step_id = self.get('browser_step_id')
+        browser_step = self.case.getStep(step_id=browser_step_id)
+        browser_step.setWeb(web)
+
     def startStep(self):
         try:
             self.find_element_list = []
@@ -177,7 +187,6 @@ class BrowserCommand(Step):
                         driver.execute_script("ngmf.setGridCellData({target}, {row}, {col}, '{value}')".format(target=command_target, row=set_row, col=set_col, value=value))
 
                 elif command == 'Combo Click':
-                    value = self.get('value')
                     item_list = driver.execute_script("return {}.itemArr".format(command_target))
                     index = next(idx for idx, item in enumerate(item_list) if item['label'] == value)
                     driver.execute_script('{target}_button.click()'.format(target=command_target, index=index))
@@ -185,92 +194,21 @@ class BrowserCommand(Step):
                 elif command == 'find':
                     pass
 
-
             '''
-            # Frame 자동 스위칭
-            if frame:
-                WebDriverWait(driver, self.get('wait_sec')).until(EC.frame_to_be_available_and_switch_to_it((By.ID, frame)))
-
-            # lacator
-            if self.get('locator') == 'id':
-                locator = By.ID
-            elif self.get('locator') == 'name':
-                locator = By.NAME
-            elif self.get('locator') == 'xpath':
-                locator = By.XPATH
-            elif self.get('locator') == 'class':
-                locator = By.CLASS_NAME
-            elif self.get('locator') == 'css_selector':
-                locator = By.CSS_SELECTOR
-            elif self.get('locator') == 'link_text':
-                locator = By.LINK_TEXT
-
-            if command == 'open':
-                url = self.get('url')
-                driver.get(url)
-            elif command in ['Type', 'Click', 'find']:
-                #time.sleep(0.5)
-                # wait
+            Browser Command 수행 후 화면에 Progressbar가 수행중이면 Loop 수행
+                - Aleart가 존재하면 Skip
+            '''
+            try:
+                driver.switch_to_alert()
+            except NoAlertPresentException:
+                driver.switch_to_default_content()
 
                 while True:
                     try:
-                        WebDriverWait(driver, 1).until(EC.element_to_be_clickable((By.ID, '___processbar2_i')))
+                        WebDriverWait(driver, 0).until(EC.element_to_be_clickable((By.ID, '___processbar2_i')))
                     except:
                         break
 
-                if wait == 'Explicit Waits':
-                    target = WebDriverWait(driver, self.get('wait_sec')).until(EC.element_to_be_clickable((locator, command_target)))
-                else:
-                    if self.get('locator') == 'id':
-                        target = driver.find_element_by_id(command_target)
-                    elif self.get('locator') == 'name':
-                        target = driver.find_element_by_name(command_target)
-                    elif self.get('locator') == 'xpath':
-                        target = driver.find_element_by_xpath(command_target)
-                    elif self.get('locator') == 'class':
-                        target = driver.find_element_by_class_name(command_target)
-                    elif self.get('locator') == 'css_selector':
-                        target = driver.find_element_by_css_selector(command_target)
-                    elif self.get('locator') == 'link_text':
-                        target = driver.find_element_by_link_text(command_target)
-
-                if command == 'Type':
-                    value = self.get('value')
-
-                    if value:
-                        value = self.getVariableValue(value)
-
-                    target.clear()
-                    target.send_keys(value)
-                    target.send_keys(Keys.ENTER)
-                elif command == 'Click':
-                    try:
-                        target.click()
-                    except ElementClickInterceptedException:
-                        driver.execute_script("arguments[0].click();", target)
-            elif command == 'find':
-                WebDriverWait(driver, self.get('wait_sec')).until(EC.element_to_be_clickable((locator, command_target)))
-            elif command == 'execute_script':
-                script = self.get('value').replace("\\", "")
-                if script:
-                    script = self.getVariableValue(script)
-
-                driver.execute_script(script)
-            elif command == 'switch_to_frame':
-                if wait == 'Explicit Waits':
-                    WebDriverWait(driver, self.get('wait_sec')).until(EC.frame_to_be_available_and_switch_to_it((locator, command_target)))
-                else:
-                    driver.switch_to_frame(command_target)
-            elif command == 'switch_to_default_content':
-                driver.switch_to_default_content()
-            elif command == 'alert_accept':
-                alert = WebDriverWait(driver, 2).until(EC.alert_is_present())
-                alert.accept()
-                #driver.switch_to.alert.accept()
-
-            driver.switch_to_default_content()
-            '''
-            #time.sleep(1)
             self.setStatus(0, '정상적으로 처리가 완료되었습니다.')
         except UnexpectedAlertPresentException:
             self.setStatus(0, '정상적으로 처리가 완료되었습니다.')
@@ -381,11 +319,13 @@ class BrowserCommand(Step):
         event_type = step_info[1]
         element_target_type = step_info[2]
         element_id = step_info[3]
-        element_value = step_info[4]
-        element_option = step_info[5]
+        frame = step_info[4]
+        element_value = step_info[5]
+        element_option = step_info[6]
 
         self.setType(event_type)
 
+        self.info['group'] = ''
         self.info['error_option'] = 'Stop'
         self.info['condition_step_id'] = ''
         self.info['description'] = ''
@@ -401,6 +341,11 @@ class BrowserCommand(Step):
             self.info['locator'] = 'id'
             self.info['command_target'] = element_id
             self.info['wait_sec'] = 3
+            '''
+            iframe을 자동셋팅하지 않음
+            iframe id는 동적으로 변경되기때문에 UI Event Capture 시점의 iframe 정보로 셋팅되면 수행 시 오류가 발생 할 수 있음
+            '''
+            #self.info['frame'] = frame
 
             if event_type in ['Grid Click', 'Grid Type', 'Grid Double Click']:
                 self.info['column'] = int(element_option['column'])

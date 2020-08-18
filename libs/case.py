@@ -39,7 +39,7 @@ class Case(object):
         self.caseDesc = ''
         self.stepList = []
         self.variables = {}
-        self.selectedStepRow = 0
+        self.selectedStepRow = -1
         self.status = -1
         self.caseId = str(uuid.uuid4())
 
@@ -114,6 +114,15 @@ class Case(object):
 
     def getSuites(self):
         return self.suites
+
+    def getStepIndex(self, step):
+        return self.stepList.index(step)
+
+    def getStepCount(self):
+        return len(self.stepList)
+
+    def getSelectedStepRow(self):
+        return self.selectedStepRow
 
     # ============================ Variable ============================
     def getApplicableVariables(self, step=None, row_index=-1, column_id='', seq=-1):
@@ -750,6 +759,21 @@ class Case(object):
 
         return index
 
+
+    def findStepIndexByGroup(self, group):
+        '''
+        Group에 해당하는 Step Index를 Return
+        :param target: (str) '사전체크'
+        :return: (int) 3
+        '''
+        try :
+            index = next(idx for idx, step in enumerate(self.stepList) if step.get('group') == group)
+        except:
+            index = -1
+
+        return index
+
+
     def findStepByType(self, step_type, key='', value=''):
         '''
         Case에 step_type과 동일한 Step을 list형태로 Return
@@ -925,12 +949,6 @@ class Case(object):
 
         return elapsed_max_time_step_list
 
-
-    def getStepCount(self):
-        return len(self.stepList)
-
-    def getSelectedStepRow(self):
-        return self.selectedStepRow
 
     def removeStep(self, step):
         remove_variable_list = step.getVariables()
