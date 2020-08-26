@@ -393,10 +393,10 @@ class AddStepDialog(QDialog, dig_class):
                 self.edt_xhrTarget.setFocus()
                 return False
 
-            if self.edt_xhrTargetNm.text() == '':
-                QMessageBox.information(self, "Add Step", "Target명을 입력하세요")
-                self.edt_xhrTargetNm.setFocus()
-                return False
+            # if self.edt_xhrTargetNm.text() == '':
+            #     QMessageBox.information(self, "Add Step", "Target명을 입력하세요")
+            #     self.edt_xhrTargetNm.setFocus()
+            #     return False
         elif self.step_type == 'Open Browser':
             if self.edt_browserNm.text() == '':
                 QMessageBox.information(self, "Add Step", "Browser명을 입력하세요")

@@ -544,6 +544,27 @@ Case</string>
     <string>Save Test Case</string>
    </property>
   </action>
+  <action name="action_sequentialCase">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/case/sequential_case.png</normaloff>:/case/sequential_case.png</iconset>
+   </property>
+   <property name="text">
+    <string>Case 순차 수행</string>
+   </property>
+   <property name="toolTip">
+    <string>Case 순차 수행</string>
+   </property>
+   <property name="statusTip">
+    <string>Play this case</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="icon/res.qrc"/>

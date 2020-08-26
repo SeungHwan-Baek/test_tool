@@ -145,22 +145,28 @@ class Variable(object):
             ref_data_list = self.case.getRefData()
             svc_combo_nm = self.get('svc_combo_nm')
 
-            svc_combo_index = next(idx for idx, refDataInfo in enumerate(ref_data_list) if refDataInfo.get('name') == svc_combo_nm)
+            try:
+                svc_combo_index = next(idx for idx, refDataInfo in enumerate(ref_data_list) if refDataInfo.get('name') == svc_combo_nm)
 
-            ref_data = ref_data_list[svc_combo_index]
+                ref_data = ref_data_list[svc_combo_index]
 
-            step = ref_data.get('target')
-            column_id = self.get('column_id')
-            row_index = self.get('row_index')
+                step = ref_data.get('target')
+                column_id = self.get('column_id')
+                row_index = self.get('row_index')
+                worker_index = self.case.getWorkerIndex()
 
-            if type(row_index) == int:
+                if worker_index > 0:
+                    row_index = worker_index
+                elif type(row_index) == int:
+                    pass
+                elif type(row_index) == dict:
+                    row_index = ref_data.getRowIndexByValue(row_index['column_id'], row_index['value'])
+                else:
+                    row_index = -1
+
+                value = ref_data.getRefValue(row_index, column_id)
+            except StopIteration:
                 pass
-            elif type(row_index) == dict:
-                row_index = ref_data.getRowIndexByValue(row_index['column_id'], row_index['value'])
-            else:
-                row_index = -1
-
-            value = ref_data.getRefValue(row_index, column_id)
             #print(value)
 
         return value

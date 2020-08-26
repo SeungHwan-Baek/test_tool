@@ -241,7 +241,9 @@ def findTrName(trxCode):
 
             try:
                 index = findDictIndexByValue(tr_info, 'TX_CODE', trxCode)
-                tx_name = tr_info[index]['TX_NAME']
+
+                if index > -1:
+                    tx_name = tr_info[index]['TX_NAME']
             except StopIteration:
                 pass
     else:

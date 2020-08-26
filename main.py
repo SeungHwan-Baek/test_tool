@@ -14,6 +14,8 @@ from PyQt5.QtCore import *
 from libs.suites import Suites
 from utils.settings import Settings
 from utils.config import Config
+from utils.websocketServer import WebSocket
+
 from widgets.suitesWidget import SuitesWidget
 from widgets.statusWidget import StatusWidget
 from dialogs.excludedTrSettingDialog import ExcludedTrDialog
@@ -24,8 +26,9 @@ from dialogs.recordDialog import RecordDialog
 from utils.webBrowser import WebBrowser
 from PyQt5 import uic
 
+
 from widgets.mainSplash import ProgressSplash
-from dialogs.addStepDialog import AddStepDialog
+from dialogs.sequentialStepDialog import SequentialStepDialog
 
 from utils.eventWorker import EventThread
 
@@ -35,6 +38,7 @@ from pyqtkeybind import keybinder
 
 import pandas as pd
 
+import PyQt5_stylesheets
 import qdarkstyle
 
 __appname__ = 'ReST Studio'
@@ -71,6 +75,8 @@ class MainWindow(QMainWindow, form_class):
         self.caseRunning = False
         self.suitesRunning = False
 
+        self.config = config
+
         self.copy_case_list = []
 
         # Load setting in the main thread
@@ -79,6 +85,11 @@ class MainWindow(QMainWindow, form_class):
         self.settings.save()
 
         self.setupUi(self)
+
+        self.websocket_server = WebSocket()
+        self.websocket_server.start()
+        self.web = WebBrowser(sid='SWGS', websocket_server=self.websocket_server)
+
         #print(self.thread())
         self.setWindowTitle("{title} ({version})".format(title=__appname__, version=__version__))
 
@@ -139,27 +150,28 @@ class MainWindow(QMainWindow, form_class):
         :return: None
         '''
         # ToolBar 버튼 이벤트
-        self.action_openSuites.triggered.connect(self.openSuitesClicked)                # 메뉴 - Open Suites 버튼 클릭
-        self.action_newSuites.triggered.connect(self.newSuitesClicked)                  # 메뉴 - New Suites 버튼 클릭
-        self.action_saveSuites.triggered.connect(self.saveSuitesClicked)                # 메뉴 - Save Suites
-        self.action_openTestCase.triggered.connect(self.openTestCaseClicked)            # 메뉴 - Open Test Case 버튼 클릭
-        self.action_addTestCase.triggered.connect(self.addTestCaseClicked)              # 메뉴 - Add Test Case 버튼 클릭
-        self.action_playCase.triggered.connect(self.playCaseClicked)                    # 메뉴 - Play Case 버튼 클릭
-        self.action_RefData.triggered.connect(self.refDataClicked)                      # 메뉴 - ref Excel 버튼 클릭
-        self.action_startSwing.triggered.connect(self.startSwingClicked)                # 메뉴 - Start Swing
-        self.action_autoAddTestStep.triggered.connect(self.autoAddTestStepClicked)      # 메뉴 - Auto Add Test Step
-        self.action_importTrInfo.triggered.connect(self.importTrInfoClicked)            # 메뉴 - Import Transaction Info
-        self.action_excludedTrSetting.triggered.connect(self.excludedSettingClicked)    # 메뉴 - Excluded Transaction Setting
-        self.action_excludedTrEnabled.toggled.connect(self.excludedEnableToggled)       # 메뉴 - Excluded Transaction Enabled
-        self.action_test.triggered.connect(self.testClicked)                            # 메뉴 - test
-        self.action_sqlEditor.triggered.connect(self.sqlEditorClicked)                  # 메뉴 - SQL Editor
+        self.action_openSuites.triggered.connect(self.openSuitesClicked)                    # 메뉴 - Open Suites 버튼 클릭
+        self.action_newSuites.triggered.connect(self.newSuitesClicked)                      # 메뉴 - New Suites 버튼 클릭
+        self.action_saveSuites.triggered.connect(self.saveSuitesClicked)                    # 메뉴 - Save Suites
+        self.action_openTestCase.triggered.connect(self.openTestCaseClicked)                # 메뉴 - Open Test Case 버튼 클릭
+        self.action_addTestCase.triggered.connect(self.addTestCaseClicked)                  # 메뉴 - Add Test Case 버튼 클릭
+        self.action_playCase.triggered.connect(self.playCaseClicked)                        # 메뉴 - Play Case 버튼 클릭
+        self.action_RefData.triggered.connect(self.refDataClicked)                          # 메뉴 - ref Excel 버튼 클릭
+        self.action_startSwing.triggered.connect(self.startSwingClicked)                    # 메뉴 - Start Swing
+        self.action_autoAddTestStep.triggered.connect(self.autoAddTestStepClicked)          # 메뉴 - Auto Add Test Step
+        self.action_importTrInfo.triggered.connect(self.importTrInfoClicked)                # 메뉴 - Import Transaction Info
+        self.action_excludedTrSetting.triggered.connect(self.excludedSettingClicked)        # 메뉴 - Excluded Transaction Setting
+        self.action_excludedTrEnabled.toggled.connect(self.excludedEnableToggled)           # 메뉴 - Excluded Transaction Enabled
+        self.action_test.triggered.connect(self.testClicked)                                # 메뉴 - test
+        self.action_sqlEditor.triggered.connect(self.sqlEditorClicked)                      # 메뉴 - SQL Editor
+        self.action_changeDriverVersion.triggered.connect(self.changeChromeDriverVersion)   # 메뉴 - chromedriver Version 변경
 
-        self.action_findData.triggered.connect(self.findDataClicked)                    # 메뉴 - Find Data
-        self.action_capture.triggered.connect(self.recordRequest)                       # 메뉴 - Capture Requests
-        self.action_clearRequests.triggered.connect(self.clearRequests)                 # 메뉴 - Clear Requests
-        self.action_setRequests.triggered.connect(self.setRequests)                     # 메뉴 - Set Requests
-        self.action_captureUiEvent.triggered.connect(self.recordUiEvent)                # 메뉴 - Capture UI Event
-        self.action_eventList.triggered.connect(self.eventListClicked)                  # 메뉴 - Event List
+        self.action_findData.triggered.connect(self.findDataClicked)                        # 메뉴 - Find Data
+        self.action_capture.triggered.connect(self.recordRequest)                           # 메뉴 - Capture Requests
+        self.action_clearRequests.triggered.connect(self.clearRequests)                     # 메뉴 - Clear Requests
+        self.action_setRequests.triggered.connect(self.setRequests)                         # 메뉴 - Set Requests
+        self.action_captureUiEvent.triggered.connect(self.recordUiEvent)                    # 메뉴 - Capture UI Event
+        self.action_eventList.triggered.connect(self.eventListClicked)                      # 메뉴 - Event List
 
         self.tab_main.currentChanged.connect(self.setComponent)
 
@@ -481,7 +493,6 @@ class MainWindow(QMainWindow, form_class):
                 currentWindow = driver.current_window_handle
                 driver.switch_to_window(currentWindow)
             else:
-                self.web = WebBrowser('SWGS')
                 self.progressBar.setRange(0, 0)
                 self.progressBar.setMsg('Swing Browser Open...')
                 self.tab_main.setEnabled(False)
@@ -489,7 +500,6 @@ class MainWindow(QMainWindow, form_class):
                 self.eventWorker.finished.connect(self.swingBrowserOpened)
                 self.eventWorker.start()
         else:
-            self.web = WebBrowser('SWGS')
             self.progressBar.setRange(0, 0)
             self.progressBar.setMsg('Swing Browser Open...')
             self.tab_main.setEnabled(False)
@@ -507,7 +517,7 @@ class MainWindow(QMainWindow, form_class):
         self.progressBar.setRange(0, 100)
         self.progressBar.setMsg('')
         self.tab_main.setEnabled(True)
-        print(self.web.getSessionId())
+        # print(self.web.getSessionId())
 
 
     def recordRequest(self):
@@ -725,6 +735,21 @@ class MainWindow(QMainWindow, form_class):
         self.sqlEditorDialog.popUp(show=True)
 
 
+    def changeChromeDriverVersion(self):
+        '''
+        setting file에서 관리하는 chromedriver version을 변경
+        :return: None
+        '''
+        self.settings.load()
+        chromedriver_version = self.settings.get("CHROMEDRIVER_VERSION", "")
+
+        new_version, ok = QInputDialog.getText(self, 'Category 수정', 'Category 명을 입력하세요.', text=chromedriver_version)
+
+        if ok and new_version:
+            self.settings["CHROMEDRIVER_VERSION"] = new_version
+            self.settings.save()
+
+
     def _twRecentSuitesDoubleClicked(self, row, col):
         '''
         Recent Suites Table Double Click 이벤트
@@ -783,15 +808,18 @@ class MainWindow(QMainWindow, form_class):
 
 
     # ============================ Signal Event ============================
-    def startCase(self):
+    def startCase(self, run_type):
         '''
         Case 수행 시 발생 Signal 이벤트
             - 하단 Progressbar 수행중으로 변경
         :return: None
         '''
         self.caseRunning = True
-        self.progressBar.setRange(0, 0)
-        self.progressBar.setMsg('Loading...')
+
+        if run_type == 'thread':
+            self.progressBar.setRange(0, 0)
+            self.progressBar.setMsg('Loading...')
+
         self.setComponent()
 
         suitesWidget = self.tab_main.currentWidget()
@@ -911,6 +939,9 @@ class MainWindow(QMainWindow, form_class):
         Test Button 클릭 이벤트
         :return: None
         '''
+        sequentialStepDialog = SequentialStepDialog()
+        sequentialStepDialog.popUp()
+
         QMessageBox.information(self, "Test Button", "Complete\n[ main.py - testClicked() ]")
 
 
@@ -959,6 +990,9 @@ def main():
     sys.excepthook = my_exception_hook
 
     app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
+
+    '''style_black, style_blue, style_Classic, style_Dark, style_DarkOrange, style_gray, style_navy'''
+    #app.setStyleSheet(PyQt5_stylesheets.load_stylesheet_pyqt5(style='style_navy'))
 
     # the shortcut
     keybinder.init()

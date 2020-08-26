@@ -47,8 +47,8 @@ class Browser(Step):
 
             if activity == 'Open Browser':
                 try:
-                    if self.web and self.web.getStatus():
-                        self.web.get()
+                    if self.web:
+                        self.web.popUp()
                     else:
                         self.web = WebBrowser(sid=self.get('sid'), url=self.get('url'))
                         self.web.popUp()
@@ -66,6 +66,7 @@ class Browser(Step):
             self.setStatus(1, str(e))
 
     def makeStep(self, driver=None):
+        self.info['step_type_group'] = 'Browser'
         self.info['group'] = 'Browser 시작'
         self.info['browser_nm'] = 'SWGS'
         self.info['sid'] = 'SWGS'

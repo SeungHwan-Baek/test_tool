@@ -34,7 +34,7 @@ from widgets.caseWidget import CaseWidget
 from widgets.stepWidget import StepWidget
 from widgets.mainSplash import ProgressSplash
 
-from utils.suitesWorker import SuitesThread              # Suites 단위 Thread 처리
+from utils.suitesWorker import SuitesThread, SuitesRefThread             # Suites 단위 Thread 처리
 
 __appname__ = 'Test Automation Tool'
 
@@ -46,7 +46,7 @@ form_class = uic.loadUiType(os.path.join(parentDir, "UI/suites_widget.ui"))[0]
 #os.environ['path'] = os.environ['path'] + os.pathsep + os.path.realpath("instantclient_12_2")
 
 class SuitesWidget(QWidget, form_class):
-    caseRunning = pyqtSignal()
+    caseRunning = pyqtSignal(str)
     caseFinished = pyqtSignal()
     suitesRunning = pyqtSignal()
     suitesFinished = pyqtSignal()
@@ -65,6 +65,7 @@ class SuitesWidget(QWidget, form_class):
         super(SuitesWidget, self).__init__(parent)
 
         self.mainWidget = parent
+        self.config = self.mainWidget.config
 
         if suites is None:
             self.suites = Suites()
@@ -168,13 +169,13 @@ class SuitesWidget(QWidget, form_class):
 
         self.setCaseInfoView(self.selected_case)
 
-    def _runCase(self):
+    def _runCase(self, run_type):
         '''
         Case 수행 시 발생 이벤트
             - step component 초기화
         :return:
         '''
-        self.caseRunning.emit()
+        self.caseRunning.emit(run_type)
         self.sw_caseStep.setCurrentIndex(1)
         self.tab_caseStep.setCurrentIndex(1)
         self.step_widget.runCase()
@@ -303,6 +304,8 @@ class SuitesWidget(QWidget, form_class):
         excluded_cnt = 0
         add = 0
 
+        OFFER_EXCLUSION_TR_LIST = self.config.getlist("section_tr", "OFFER_EXCLUSION_TR_LIST")
+
         for requestDtl in request_list:
             trxCode = requestDtl['trx_code']
             inputData = requestDtl['input_data']
@@ -324,14 +327,17 @@ class SuitesWidget(QWidget, form_class):
                 step['target_nm'] = tx_name
                 step['error_option'] = 'Stop'
 
+                if trxCode in OFFER_EXCLUSION_TR_LIST:
+                    step['offer_exclusion'] = True
+
                 self.selected_case.setStepList(step)
 
                 # Data Info 추가
                 step.setInputData(inputData)
                 step.setOutputData(outputData)
 
-                step.getTrIO()
-                step.mergeTrInfo("CHANGE")
+                tr_info = step.getTrInfo(action='UDetail')
+                step.setTrIO("CHANGE", tr_info)
 
                 add += 1
 
@@ -413,7 +419,7 @@ class SuitesWidget(QWidget, form_class):
             try:
                 output_data = copySting.split("::")[1]
             except IndexError:
-                output_data = ''
+                output_data = {}
 
             try:
                 if type(input_data) == str:
@@ -443,12 +449,16 @@ class SuitesWidget(QWidget, form_class):
                 if reply == QMessageBox.Yes:
                     tx_name = findTrName(trxCode)
 
-                    target_nm, ok = QInputDialog.getText(self, 'Step Description', 'Step에 대한 Description을 입력하세요.', text=tx_name)
+                    target_nm, ok = QInputDialog.getText(self, 'Step 추가', 'Target명을 입력하세요.', text=tx_name)
 
-                    if ok and target_nm:
+                    if ok:
                         current_step_index = self.selected_case.getSelectedStepRow()
-                        current_step = self.selected_case.getStep(idx=current_step_index)
-                        group = current_step.get('group')
+
+                        if current_step_index > -1:
+                            current_step = self.selected_case.getStep(idx=current_step_index)
+                            group = current_step.get('group')
+                        else:
+                            group = ''
 
                         step = Xhr(case=self.selected_case, step_type='XHR')
                         step['group'] = group
@@ -521,7 +531,7 @@ class SuitesWidget(QWidget, form_class):
 
             self.checked_case_list = self.case_widget.getCheckedCase()
             caseCnt = len(self.checked_case_list)
-            
+
         for case in self.checked_case_list:
             self.suites_step_cnt += case.getStepCount()
 
@@ -536,12 +546,13 @@ class SuitesWidget(QWidget, form_class):
                 self.tmp_marking_data = []
                 self.stop_thread = False
 
-                thread_cnt, ok = QInputDialog.getInt(self, 'Thread', 'Thread 수를 입력하세요.', value=1, min=1, max=10)
+                MAX_THREAD_CNT = self.config.getInt("section_common", "MAX_THREAD_CNT")
+
+                thread_cnt, ok = QInputDialog.getInt(self, 'Thread', 'Thread 수를 입력하세요.', value=1, min=1, max=MAX_THREAD_CNT)
 
                 if ok:
                     self.sw_caseStep.setCurrentIndex(0)
 
-                    self.thread_list = chunkList(self.checked_case_list, thread_cnt)
                     #print(self.thread_list)
 
                     self.case_widget.tw_testCase.clearSelection()
@@ -558,51 +569,32 @@ class SuitesWidget(QWidget, form_class):
                     # Main으로 Signal
                     self.suitesRunning.emit()
 
-                    #if thread_cnt > 1:
-                    for idx, case_list in enumerate(self.thread_list):
-                        worker_index = idx + 1
-                        setattr(self, 'suitesWorker_{}'.format(worker_index), SuitesThread(self.suites, case_list=case_list, worker_index=worker_index))
-                        getattr(self, "suitesWorker_{}".format(worker_index)).change_value.connect(self.workerProgessChaneValue)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).send_case_signal.connect(self.getSuitesCaseSignal)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).send_get_variable_signal.connect(self.getCaseVariableValue)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).send_end_get_variable.connect(self.getCaseVariableEnd)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).send_step_finish_signal.connect(self.getSuitesStepFinishSignal)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).finished.connect(self.suitesWorkerFinished)
-                        getattr(self, "suitesWorker_{}".format(worker_index)).terminated.connect(self.suitesWorkerTerminated)
+                    self.suitesRefWorker = SuitesRefThread(self.suites, case_list=self.checked_case_list, thread_cnt=thread_cnt)
+                    self.suitesRefWorker.send_start_get_variable.connect(self.getCaseVariableStart)
+                    self.suitesRefWorker.send_get_variable_signal.connect(self.getCaseVariableValue)
+                    self.suitesRefWorker.send_end_get_variable.connect(self.getCaseVariableEnd)
+                    self.suitesRefWorker.finished.connect(lambda: (self.getCaseVariableFinished(thread_cnt=thread_cnt)))
 
-                        getattr(self, "suitesWorker_{}".format(worker_index)).start()  # Thread 실행
+                    self.suitesRefWorker.start()
 
-                        self.therad_worker_list.append(getattr(self, "suitesWorker_{}".format(worker_index)))
+                    #print("Start - suitesWorker_{}".format(worker_index))
 
-                        #print("Start - suitesWorker_{}".format(worker_index))
-                    '''
-                    else:
-                        self.suitesWorker = SuitesThread(self.suites, case_list=self.checked_case_list)
-                        self.suitesWorker.change_value.connect(self.workerProgessChaneValue)
-                        self.suitesWorker.send_case_signal.connect(self.getSuitesCaseSignal)
-                        self.suitesWorker.send_get_variable_signal.connect(self.getCaseVariableValue)
-                        self.suitesWorker.send_end_get_variable.connect(self.getCaseVariableEnd)
-                        self.suitesWorker.send_step_finish_signal.connect(self.getSuitesStepSignal)
-                        self.suitesWorker.finished.connect(self.suitesWorkerFinished)
-                        self.suitesWorker.terminated.connect(self.suitesWorkerTerminated)
-                        self.suitesWorker.start()
-                    '''
-
-                    self.splash.setCaseProgressText('Play Suites...')
-                    self.splash.setCnt(0, len(self.checked_case_list))
+                    self.splash.setCaseProgressText('참조 데이타 조회...')
                     self.splash.popup()
             else:
                 # 자동으로 모두 선택된 경우만 해제
                 if all_checked:
                     self.case_widget.setChecked(checked=False)
 
-    # ============================ QThread Temp ============================
+    # ============================ QThread ============================
     def stopSuitesWorker(self):
         '''
         Suites 수행 중지 버튼 클릭 이벤트
         :return: None
         '''
         self.stop_thread = True
+
+        self.suitesRefWorker.stop()
 
         for idx, case_list in enumerate(self.thread_list):
             getattr(self, "suitesWorker_{}".format(idx + 1)).stop()
@@ -612,7 +604,8 @@ class SuitesWidget(QWidget, form_class):
         #text = 'Case [{case_nm}] ...'.format(case_nm=case.getCaseNm())
         #self.case_widget.setSelectedTestCase(case.getCaseId(), True)
         #self.case_widget.setFocusTestCase(case.getCaseId())
-        self.splash.startCaseProgress()
+        #self.splash.startCaseProgress()
+        pass
 
 
     def getSuitesCaseSignal(self, case, idx, marking_data):
@@ -655,22 +648,75 @@ class SuitesWidget(QWidget, form_class):
         text = 'Request [{target}] ...'.format(target=step.get('target'))
         self.complete_step_cnt += 1
 
-        #case_per = ((self.complete_step_cnt / self.suites_step_cnt) * 100)
+        case_per = ((self.complete_step_cnt / self.suites_step_cnt) * 100)
 
-        #self.splash.setCaseProgressPer(case_per)
+        self.splash.setCaseProgressPer(case_per)
         #self.splash.setStepProgressPer(per, text)
         self.case_widget.setCaseDtlProgressbar(case=case, per=per)
         #self._stepFinished(step, index)
 
+    def getCaseVariableStart(self, tot_cnt):
+        '''
+        Reference Data 가져오기 Thread 시작 시 발생 이벤트
+        :param tot_cnt: (int) 3
+        '''
+        self.splash.setCnt(0, tot_cnt)
+
+
+    def getCaseVariableEnd(self, tot_cnt, finished_cnt):
+        '''
+        Reference Data 가져오기 건별 종료시 발생 이벤트
+        :param tot_cnt: (int) 3
+        :param finished_cnt: (int) 1
+        '''
+        ref_per = ((finished_cnt / tot_cnt) * 100)
+        self.splash.setCaseProgressPer(ref_per)
+        self.splash.setCnt(finished_cnt, tot_cnt)
+
 
     def getCaseVariableValue(self, variable_nm):
-        text = '참조 데이타 조회 [{target}] ...'.format(target=variable_nm)
-        #self.splash.startStepProgress(text)
+        text = '[{target}] ...'.format(target=variable_nm)
+        self.splash.setStepProgressText(text)
 
 
-    def getCaseVariableEnd(self):
-        #self.splash.endStepProgress()
-        pass
+    def getCaseVariableFinished(self, thread_cnt):
+        '''
+        Reference Data 가져오기 Thread 종료 시 발생 이벤트
+        '''
+        if self.stop_thread:
+            self.splash.endCaseProgress()
+
+            self.case_widget.tw_testCase.setEnabled(True)
+            self.btn_playSuites.setEnabled(True)
+            self.btn_playSuites.setCheckable(False)
+            self.btn_playSuites.setChecked(False)
+
+            self.suitesFinished.emit()
+            self.splash.close()
+
+            QMessageBox.information(self, "Stop", "중지되었습니다.")
+        else:
+            self.splash.setCaseProgressText('Play Suites...')
+            self.splash.endStepProgress('Case 수행...')
+            self.splash.setCnt(0, len(self.checked_case_list))
+            self.splash.setCaseProgressPer(0)
+
+            self.therad_worker_list = []
+            self.thread_list = chunkList(self.checked_case_list, thread_cnt)
+
+            for idx, case_list in enumerate(self.thread_list):
+                worker_index = idx + 1
+                setattr(self, 'suitesWorker_{}'.format(worker_index), SuitesThread(self.suites, case_list=case_list, worker_index=worker_index))
+                getattr(self, "suitesWorker_{}".format(worker_index)).change_value.connect(self.workerProgessChaneValue)
+                getattr(self, "suitesWorker_{}".format(worker_index)).send_case_signal.connect(self.getSuitesCaseSignal)
+                getattr(self, "suitesWorker_{}".format(worker_index)).send_step_finish_signal.connect(self.getSuitesStepFinishSignal)
+                getattr(self, "suitesWorker_{}".format(worker_index)).finished.connect(self.suitesWorkerFinished)
+                getattr(self, "suitesWorker_{}".format(worker_index)).terminated.connect(self.suitesWorkerTerminated)
+
+                getattr(self, "suitesWorker_{}".format(worker_index)).start()  # Thread 실행
+
+                self.therad_worker_list.append(getattr(self, "suitesWorker_{}".format(worker_index)))
+
 
     def suitesWorkerFinished(self):
         sender = self.sender()
@@ -798,7 +844,10 @@ class SuitesWidget(QWidget, form_class):
 
         self.complete_case_cnt = 0
 
-        suitesWorker = SuitesThread(self.suites, case_list=case_list)
+        for case in case_list:
+            self.suites_step_cnt += case.getStepCount()
+
+        suitesWorker = SuitesThread(self.suites, case_list=case_list, variable_skip=False)
         suitesWorker.send_case_signal.connect(self.getSuitesCaseSignal)
         suitesWorker.send_step_finish_signal.connect(self.getSuitesStepFinishSignal)
         suitesWorker.finished.connect(partial(self.scheduleFinished, schedule_id))

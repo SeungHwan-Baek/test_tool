@@ -21,8 +21,6 @@ class Xhr(Step):
     url = ''
     trx_code = ''
 
-    tr_info = {}
-
     def __init__(self, case=None, step_type=''):
         Step.__init__(self, case=case, step_type=step_type)
 
@@ -1227,39 +1225,63 @@ class Xhr(Step):
 
         return data_list_type
 
-    def getTrIO(self):
+
+    def getTrInfo(self, action):
+        '''
+        Transaction의 정보를 가져옴
+        :param action: (str) 'UDetail', 'US'
+                      'UDetail' - IO정보 조회
+                      'US' - Transaction명 조회
+        :return: (dict) {InRegDate: "", OutRegDate: "", SvcName: "NGMSLOV00010T01", TrxCode: "ZNGMSLOV00010_TR01",…}
+        '''
         try:
-            request_url = 'http://172.31.196.21:8060/websquare/Service/layout?TrxCode={}&Action=UDetail'.format(self.trx_code)
+            request_url = 'http://172.31.196.21:8060/websquare/Service/layout?TrxCode={trx_code}&Action={action}'.format(trx_code=self.trx_code, action=action)
             r = requests.post(request_url)
 
-            tmp_tr_info = r.json()
-            error_code = int(tmp_tr_info['params'][0]['ErrorCode'])
+            tr_info = r.json()
+            error_code = int(tr_info['params'][0]['ErrorCode'])
 
             if error_code > 0:
                 pass
                 return False
             else:
-                self.tr_info = tmp_tr_info
-                return True
+                return tr_info
         except:
-            print('Error : getTrIO')
+            print('Error : getTrInfo')
             return False
 
-    def mergeTrInfo(self, method):
+
+    def setTrIO(self, method, tr_info):
         for data_list_id in self.getDataListId():
             data_type = " ".join(re.findall("[a-zA-Z]+", data_list_id))
             rec_Index = " ".join(re.findall("\d+", data_list_id))
 
             if data_type == 'input':
                 # print(data['InFormat'])
-                filterList = list(filter(lambda row: row['RecIndex'] == rec_Index, self.tr_info['InFormat']))
+                filterList = list(filter(lambda row: row['RecIndex'] == rec_Index, tr_info['InFormat']))
 
                 for fieldInfo in filterList:
-                    self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
+                    if method == 'MERGE':
+                        description = self.getColumnValue(data_list_id, fieldInfo['FieldName'], 'description')
+
+                        if description:
+                            pass
+                        else:
+                            self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
+                    else:
+                        self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
             elif data_type == 'output':
-                filterList = list(filter(lambda row: row['RecIndex'] == rec_Index, self.tr_info['OutFormat']))
+                filterList = list(filter(lambda row: row['RecIndex'] == rec_Index, tr_info['OutFormat']))
                 for fieldInfo in filterList:
-                    self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
+                    if method == 'MERGE':
+                        description = self.getColumnValue(data_list_id, fieldInfo['FieldName'], 'description')
+
+                        if description:
+                            pass
+                        else:
+                            self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
+                    else:
+                        self.setColumnValue(data_list_id, fieldInfo['FieldName'], 'description', fieldInfo['FieldDesc'])
 
 
     def startStep(self):
@@ -1279,7 +1301,7 @@ class Xhr(Step):
 
             if self.getCondRst():
                 err_option = self.getErrOption()
-                r = requests.get(self.url, json=self.input_data)
+                r = requests.post(self.url, json=self.input_data)
                 #print(self.input_data)
                 self.statusCode = r.status_code
 
@@ -1308,3 +1330,4 @@ class Xhr(Step):
             print(e)
         finally:
             self.remove('log_enable')
+            self.remove('offer_exclusion')

@@ -596,13 +596,13 @@
   </action>
   <action name="action_removeStepByExlTrList">
    <property name="text">
-    <string>제외리스트 Step 모두 삭제</string>
+    <string>제외리스트에 포함된 Step 모두 삭제</string>
    </property>
    <property name="toolTip">
-    <string>제외리스트 Step 모두 삭제</string>
+    <string>제외리스트에 포함된 Step 모두 삭제</string>
    </property>
    <property name="statusTip">
-    <string>제외리스트 Step 모두 삭제</string>
+    <string>제외리스트에 포함된 Step 모두 삭제</string>
    </property>
   </action>
   <action name="action_replayXhr">
@@ -714,10 +714,10 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Transaction IO 정보 가져오기...</string>
+    <string>IO 정보 가져오기...</string>
    </property>
    <property name="toolTip">
-    <string>Transaction IO 정보 가져오기...</string>
+    <string>IO 정보 가져오기...</string>
    </property>
    <property name="statusTip">
     <string>Transaction IO 정보 가져오기...</string>
@@ -1098,6 +1098,35 @@
    </property>
    <property name="statusTip">
     <string>변수삭제</string>
+   </property>
+  </action>
+  <action name="action_renameGroup">
+   <property name="icon">
+    <iconset resource="icon/res.qrc">
+     <normaloff>:/variable/rename.png</normaloff>:/variable/rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Group명 변경</string>
+   </property>
+   <property name="toolTip">
+    <string>Group명 변경</string>
+   </property>
+  </action>
+  <action name="action_getTrNm">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Transaction명 가져오기...</string>
+   </property>
+   <property name="toolTip">
+    <string>Transaction명 가져오기...</string>
+   </property>
+   <property name="statusTip">
+    <string>Transaction명 가져오기...</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
    </property>
   </action>
  </widget>

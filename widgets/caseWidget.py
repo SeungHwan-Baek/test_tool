@@ -15,6 +15,7 @@ from dialogs.caseDialog import CaseDialog
 from dialogs.autoVariableDialog import AutoVariableDialog
 from dialogs.variableListDialog import VariableListDialog
 from dialogs.markingDataDialog import MarkingDataDialog
+from dialogs.sequentialStepDialog import SequentialStepDialog
 from widgets.mainSplash import ProgressSplash
 
 from utils.caseWorker import CaseThread              # Case 단위 Thread 처리
@@ -30,7 +31,7 @@ class CaseWidget(QWidget, widget_class):
     stepFinished = pyqtSignal("PyQt_PyObject", int)
     caseFinished = pyqtSignal()
     varLoadApplied = pyqtSignal()
-    run = pyqtSignal()
+    run = pyqtSignal(str)
     changeStep = pyqtSignal(str, str, int, str)
     saveVariable = pyqtSignal(dict)
     copied = pyqtSignal("PyQt_PyObject")
@@ -127,6 +128,7 @@ class CaseWidget(QWidget, widget_class):
         self.action_pasteTestCase.triggered.connect(self.pasteTestCaseClicked)              # 메뉴 - Paste Test Case
         self.action_removeCase.triggered.connect(self.removeTestCaseClicked)                # 메뉴 - Remove Test Case
         self.action_scheduleCase.triggered.connect(self.scheduleCaseClicked)                # 메뉴 - Schedule Test Case
+        self.action_sequentialCase.triggered.connect(self.sequentialCaseClicked)            # 메뉴 - Test Case 순차 수행
         self.action_resetRowInfo.triggered.connect(self.resetRowInfoClicked)                # 메뉴 - Reset Row Info
         self.action_autoVariable.triggered.connect(self.autoVariableClicked)                # 메뉴 - Auto Variable
         self.action_variableList.triggered.connect(self.variableListClicked)                # 메뉴 - Variable List
@@ -141,7 +143,7 @@ class CaseWidget(QWidget, widget_class):
         self.action_capture.triggered.connect(self.captureClicked)                          # 메뉴 - capture
 
         # Tree 이벤트
-        self.tw_testCase.customContextMenuRequested.connect(self.setTestCaseContextMenu)
+        self.tw_testCase.customContextMenuRequested.connect(self._setTestCaseContextMenu)
 
         self.tw_testCase.itemSelectionChanged.connect(self.twTestCaseItemSelectionChanged)  # Test Case Item Selection Changed 이벤트
         self.tw_testCase.itemClicked.connect(self.twTestCaseItemClicked)                    # Test Case Item Clicked 이벤트
@@ -241,13 +243,15 @@ class CaseWidget(QWidget, widget_class):
 
 
     # ============================ Context ============================
-    def setTestCaseContextMenu(self, pos):
+    def _setTestCaseContextMenu(self, pos):
         index = self.tw_testCase.indexAt(pos)
 
         menu = QMenu()
         menu.setMinimumSize(QSize(350, 0))
 
         copy_case_list = self.suitesWidget.getCopyCaseList()
+        selected_items = self.tw_testCase.selectedItems()
+        selected_cnt = len(selected_items)
 
         if not index.isValid():
             self.tw_testCase.clearSelection()
@@ -271,8 +275,12 @@ class CaseWidget(QWidget, widget_class):
             menu.addAction(self.action_addTestCase)
             menu.addSeparator()
             menu.addAction(self.action_openTestCase)
-            if copy_case_list:
+
+            if self.isCase():
+                menu.addAction(self.action_copyTestCase)
+            if copy_case_list and selected_cnt == 1:
                 menu.addAction(self.action_pasteTestCase)
+
             menu.addAction(self.action_closeAllTestCase)
             menu.addSeparator()
             menu.exec_(self.tw_testCase.mapToGlobal(pos))
@@ -280,12 +288,14 @@ class CaseWidget(QWidget, widget_class):
             if pos:
                 menu.addAction(self.action_playCase)
                 menu.addAction(self.action_scheduleCase)
+                menu.addAction(self.action_sequentialCase)
                 menu.addSeparator()
                 menu.addAction(self.action_addTestCase)
                 menu.addSeparator()
                 menu.addAction(self.action_saveTestCase)
                 menu.addAction(self.action_openTestCase)
-                menu.addAction(self.action_copyTestCase)
+                if self.isCase():
+                    menu.addAction(self.action_copyTestCase)
                 if copy_case_list:
                     menu.addAction(self.action_pasteTestCase)
                 menu.addAction(self.action_closeAllTestCase)
@@ -423,12 +433,22 @@ class CaseWidget(QWidget, widget_class):
         :return: None
         '''
         #print(self.getCheckedCase())
-        checked_case_list = self.getCheckedCase()
+        copy_case_list = []
 
-        if checked_case_list:
-            self.copied.emit(checked_case_list)
-        else:
-            self.copied.emit([self.selected_case])
+        selectedItems = self.tw_testCase.selectedItems()
+
+        for item in selectedItems:
+            selectedNode = item
+
+            if selectedNode is not None:
+                caseId = selectedNode.text(1)
+                case = self.suites.findCase(caseId)
+
+                if case:
+                    copy_case_list.append(case)
+
+        self.copied.emit(copy_case_list)
+
         QMessageBox.information(self, "Copy Case", "Copy Complete")
 
 
@@ -443,6 +463,17 @@ class CaseWidget(QWidget, widget_class):
                     #copied_case = copy.deepcopy(case)
                     copied_case = pickle.loads(pickle.dumps(case, -1))
                     copied_case.initStatus()
+
+                    # Category 변경
+                    item = self.tw_testCase.currentItem()
+
+                    category_id = item.text(2)
+
+                    if not category_id:
+                        category_id = item.parent().text(2)
+
+                    copied_case.setCategory(category_id)
+
                     self.suites.setCaseList(copied_case)
 
                 self.setTestCaseView()
@@ -463,6 +494,32 @@ class CaseWidget(QWidget, widget_class):
 
     def scheduleCaseClicked(self):
         self.suitesWidget.addSchedule()
+
+
+    def sequentialCaseClicked(self):
+        self.selected_case.initStepStatus()  # Step 상태 초기화
+        self.setCaseDtlStatusInit(self.selected_case.getCaseId())  # Case 상태 초기화
+
+        self.case_running = True
+        self.setComponent()
+
+        self.run.emit('seq')
+
+        sequentialStepDialog = SequentialStepDialog()
+        sequentialStepDialog.runStep.connect(self.sequentialRunStep)
+        sequentialStepDialog.stopped.connect(self.sequentialStepStopped)
+        sequentialStepDialog.closed.connect(self.sequentialStepStopped)
+        sequentialStepDialog.popUp(self.selected_case, self.suitesWidget.mainWidget)
+
+
+    def sequentialRunStep(self, step, idx):
+        self.stepFinished.emit(step, idx)
+
+
+    def sequentialStepStopped(self):
+        self.case_running = False
+        self.setComponent()
+        self.caseFinished.emit()
 
 
     def resetRowInfoClicked(self):
@@ -600,7 +657,7 @@ class CaseWidget(QWidget, widget_class):
             self.case_running = True
             self.setComponent()
 
-            self.run.emit()
+            self.run.emit('thread')
 
             self.caseWorker = CaseThread(self.suites, self.selected_case, index, self.worker_id, self.suitesWidget.mainWidget)
             self.caseWorker.send_start_step_signal.connect(self.getCaseStepStartSignal)
@@ -871,7 +928,11 @@ class CaseWidget(QWidget, widget_class):
             self.tw_testCase.setItemWidget(myQTreeWidgetItem, 0, caseDtlWidget)
             '''
 
-            category_node = self.tw_testCase.findItems(case.getCategory(), Qt.MatchExactly | Qt.MatchRecursive,column=2)[0]
+            try:
+                category_node = self.tw_testCase.findItems(case.getCategory(), Qt.MatchExactly | Qt.MatchRecursive,column=2)[0]
+            except IndexError:
+                category_node = self.tw_testCase
+
             child_node = addTreeChild(parent=category_node, text=case.caseNm, check=True)
             child_node.setText(1, case.caseId)
 
@@ -1067,6 +1128,52 @@ class CaseWidget(QWidget, widget_class):
             self.tw_testCase.removeItemWidget(caseItem, 0)
 
             return None
+
+
+    def isCategory(self):
+        '''
+        선택된 Test Case Tree Widget Item 중에 Category 존재여부
+        :return: (bool) True
+        '''
+
+        result = False
+        selectedItems = self.tw_testCase.selectedItems()
+
+        for item in selectedItems:
+            parentNode = item.parent()
+            selectedNode = item
+
+            if selectedNode is not None:
+                category_id = selectedNode.text(2)
+
+                if category_id:
+                    result = True
+                    break
+
+        return result
+
+
+    def isCase(self):
+        '''
+        선택된 Test Case Tree Widget Item 중에 Case 존재여부
+        :return: (bool) True
+        '''
+
+        result = False
+        selectedItems = self.tw_testCase.selectedItems()
+
+        for item in selectedItems:
+            parentNode = item.parent()
+            selectedNode = item
+
+            if selectedNode is not None:
+                case_id = selectedNode.text(1)
+
+                if case_id:
+                    result = True
+                    break
+
+        return result
 
 
 

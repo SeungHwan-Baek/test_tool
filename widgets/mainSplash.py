@@ -204,8 +204,9 @@ class ProgressSplash(QSplashScreen):
         if text:
             self.setStepProgressText(text)
 
-    def endStepProgress(self):
+    def endStepProgress(self, text=''):
         self.caseProgressBar.setRange(0, 100)
+        self.setStepProgressText(text)
 
     def popup(self):
         self.splash.show()

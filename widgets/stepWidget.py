@@ -111,6 +111,7 @@ class StepWidget(QMainWindow, widget_class):
         self.action_beforeNewStep.triggered.connect(self._beforeNewStepClicked)                     # 메뉴 - Add before current Step
         self.action_afterNewStep.triggered.connect(self._afterNewStepClicked)                       # 메뉴 - Add after current Step
         self.action_addNewStepToGroup.triggered.connect(self._addNewStepToGroupClicked)             # 메뉴 - Add step to group
+        self.action_renameGroup.triggered.connect(self._renameGroupClicked)                         # 메뉴 - Group명 변경
         self.action_newStep.triggered.connect(self._addStepClicked)                                 # 메뉴 - Add Test Case
         self.action_ifNewStep.triggered.connect(self._ifNewStepClicked)                             # 메뉴 - Add Step inside conditional statement
         self.action_openTestStep.triggered.connect(self._openTestStepClicked)                       # 메뉴 - Open Test Step
@@ -130,6 +131,7 @@ class StepWidget(QMainWindow, widget_class):
         self.action_romoveReference.triggered.connect(self._removeReferenceClicked)                 # 메뉴 - Remove Reference
         self.action_getReferenceValue.triggered.connect(self._getReferenceValueClicked)             # 메뉴 - Get Reference Value
         self.action_getTrIOInfo.triggered.connect(self._getTrIOInfo)                                # 메뉴 - Get Transaction IO Info
+        self.action_getTrNm.triggered.connect(self._getTrNm)                                        # 메뉴 - Get Transaction Name
         self.action_addExclutionTrList.triggered.connect(self._addExclutionTrListClicked)           # 메뉴 - Add to exclusion transaction list
         self.action_group.triggered.connect(self.groupClicked)                                      # 메뉴 - Group
         self.action_setRefByValue.triggered.connect(lambda: self.setRefByValue(ref_variable='Row')) # 메뉴 - Set Reference By Value
@@ -196,6 +198,8 @@ class StepWidget(QMainWindow, widget_class):
                 if pos:
                     # 그룹 선택 시
                     if self.selected_step is None:
+                        menu.addAction(self.action_renameGroup)
+                        menu.addSeparator()
                         menu.addAction(self.action_addNewStepToGroup)
                         menu.addAction(self.action_openTestStep)
                         menu.addSeparator()
@@ -235,7 +239,9 @@ class StepWidget(QMainWindow, widget_class):
                             #     #action.triggered.connect(partial(self.dataValueDialogPopup, dataListId))
                             #     dataList_menu.addAction(action)
                             menu.addAction(self.action_copyTestData)
-                            menu.addAction(self.action_getTrIOInfo)
+                            transaction_info_menu = menu.addMenu('Transaction 정보')
+                            transaction_info_menu.addAction(self.action_getTrIOInfo)
+                            transaction_info_menu.addAction(self.action_getTrNm)
                             menu.addSeparator()
                         menu.addAction(self.action_replayXhr)
                         menu.addAction(self.action_replayAllXhrToDown)
@@ -397,6 +403,30 @@ class StepWidget(QMainWindow, widget_class):
         addStepDialog = AddStepDialog(call_gubun='New', case=case, group=group, index=index)
         addStepDialog.added.connect(self._stepAdded)
         addStepDialog.popUp()
+
+
+    def _renameGroupClicked(self):
+        '''
+        Group명 변경 이벤트
+        '''
+        for item in self.tw_testStep.selectedItems():
+            parentNode = item.parent()
+            selectedNode = item
+
+        if parentNode is None:
+            group = selectedNode.text(0)
+
+        new_group, ok = QInputDialog.getText(self, 'Group명 변경', 'Group명을 입력하세요.',  text=group)
+
+        if ok and new_group:
+            for idx in range(0, self.tw_testStep.currentItem().childCount()):
+                child_stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem().child(idx), 0)
+                child_step = child_stepWidget.getStep()
+                child_step['group'] = new_group
+
+            self.setStepView()
+            QMessageBox.information(self, "Group명 변경", "Group명을 변경하였습니다.")
+
 
 
     def _addStepClicked(self):
@@ -722,12 +752,15 @@ class StepWidget(QMainWindow, widget_class):
         self.selected_step.getValueByRef()
         self.setDataDtlView()
 
+
     def _getTrIOInfo(self):
         '''
         Tr I/O 정보를 조회하여 Setting
         :return: None
         '''
-        if self.selected_step.getTrIO():
+        tr_info = self.selected_step.getTrInfo(action='UDetail')
+
+        if tr_info:
             reply = QMessageBox.question(self, 'Get Transaction IO Info',"Transaction IO 정보를 변경하시겠습니까?",QMessageBox.Yes, QMessageBox.No)
 
             if reply == QMessageBox.Yes:
@@ -735,7 +768,24 @@ class StepWidget(QMainWindow, widget_class):
                 item, ok = QInputDialog.getItem(self, 'Select Method', 'Transaction IO 정보 변환 방법을 선택하세요', items, 0, False)
 
                 if ok and item:
-                    self.selected_step.mergeTrInfo(item)
+                    self.selected_step.setTrIO(item, tr_info)
+                    self.setDataDtlView()
+
+
+    def _getTrNm(self):
+        '''
+        Transaction Name 정보를 조회하여 Setting
+        :return: None
+        '''
+        tr_info = self.selected_step.getTrInfo(action='US')
+
+        if tr_info:
+            self.selected_step['target_nm'] = tr_info['BasicInfo'][0]['TrxCodeName']
+            self.setStepView()
+            self.setPropertyView()
+            QMessageBox.information(self, "Transaction Name 변경", "Transaction Name을 변경하였습니다.")
+
+
 
     def _addExclutionTrListClicked(self):
         excluded_tr_list = self.suites.getExcludedTrList()
@@ -963,8 +1013,7 @@ class StepWidget(QMainWindow, widget_class):
                 return False
 
             if self.selected_step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
-                if self.suitesWidget.mainWidget.getWebStatus:
-                    self.selected_step.setWeb(self.suitesWidget.mainWidget.web)
+                self.selected_step.setWeb(self.suitesWidget.mainWidget.web)
 
             self.eventWorker = EventThread(self.selected_step.startStep)
             self.eventWorker.finished.connect(self.replayXhrFinished)
@@ -986,6 +1035,7 @@ class StepWidget(QMainWindow, widget_class):
 
         stepWidget = self.tw_testStep.itemWidget(self.tw_testStep.currentItem(), 0)
         stepWidget.setStatus()
+        stepWidget.setTarget()
         stepWidget.setAddInfo(add_info_type)
 
         msg = self.selected_step.getParamsMsg()

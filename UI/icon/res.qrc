@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="case">
+    <file>sequential_case.png</file>
     <file>category_setting.png</file>
     <file>case_setting.png</file>
     <file>remove_case.png</file>

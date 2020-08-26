@@ -95,13 +95,9 @@ class CaseThread(QThread):
                         self.case.getMarkingData(self.worker_id, step=step)
 
                     if step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
-                        if self.mainWidget.getWebStatus:
-                            step.setWeb(self.mainWidget.web)
+                        step.setWeb(self.mainWidget.web)
 
                     step.startStep()
-
-                    if step.get('step_type_group') in ['Browser', 'Browser Command', 'Browser Command (Swing)']:
-                        self.mainWidget.web = step.getWeb()
 
                     code = step.getParamsCode()
                     msg = step.getParamsMsg()

@@ -81,11 +81,19 @@ class StepDtlWidget(QWidget, widget_class):
         elif text == 'SMS':
             self.lbl_type.setPixmap(QPixmap(':/step/' + 'send.png'))
 
-    def setTarget(self, text):
+    def setTarget(self, text=''):
+        if not text:
+            text = self.step.get('target')
+
         step_type = self.step.getType()
+
         if step_type == 'XHR':
+            if self.step.get('offer_exclusion', False):
+                color = 'Gray'
+            else:
+                color = 'LightSkyBlue'
             #self.lbl_target.setText("<h4><font color='MediumSlateBlue'> {target} </font> ({desc}) </h4>".format(target=text, desc=self.step.get('description')))
-            self.lbl_target.setText("<span style=' font-size:9pt; font-weight:600; color:LightSkyBlue;'>{target}  </span><span style=' font-size:9pt;'>({desc})</span>".format(target=text, desc=self.step.get('target_nm')))
+            self.lbl_target.setText("<span style=' font-size:9pt; font-weight:600; color:{color};'>{target}  </span><span style=' font-size:9pt;'>({desc})</span>".format(color=color, target=text, desc=self.step.get('target_nm')))
         elif step_type == 'Sleep':
             self.lbl_target.setText("<h4><font color='Thistle'> {} </font></h4>".format(text))
         elif step_type == 'Open Browser':

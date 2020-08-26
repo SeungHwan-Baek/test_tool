@@ -44,7 +44,7 @@ class Reference:
     def getId(self):
         return self.id
 
-    def getXhrSvcCombo(self, paging=1):
+    def getXhrSvcCombo(self, paging=1, row_cnt=1):
         inputData = '{"HEAD":{"Trx_Code":"ZNGMSCOD00010_TR02","Ngms_UserId":"1000495877","Ngms_LogInId":"YUNWOONG","Ngms_EmpNum":"","Ngms_OrgId":"A000700000","Ngms_HrOrgCd":"","Ngms_PostOrgCd":"A000700000","Ngms_PostSaleOrgCd":"A000700000","Ngms_SupSaleOrgCd":"A010890000","Ngms_IpAddr":"150.28.79.196","Ngms_BrTypCd":"450","Ngms_AuthId":"","Ngms_ConnOrgId":"A000700000","Ngms_ConnOrgCd":"A000700000","Ngms_ConnSaleOrgId":"A000700000","Ngms_ConnSaleOrgCd":"A000700000","Ngms_AuthTypPermCd":"EQ","Ngms_PostSaleOrgId":"A000700000","Ngms_SupSaleOrgId":"A010890000","Term_Type":"0","User_Term_Type":"","St_Stop":"0","St_Trace":"","Stx_Dt":"","Stx_Tm":"","Etx_Dt":"","Etx_Tm":"","Rt_Cd":"","Screen_Name":"ZORDSUDCS0040","Msg_Cnt":"0","Handle_Id":"194902345 ","Ngms_Filler1":"","Ngms_CoClCd":"T","Screen_Call_Trace":"Top-ZORDSS03S0000-ZNGMSCOD00010_TR02","rowStatus":"C"},"input1":{"map_id":"zngm_pgm_f0042","iparam1":"ZORDSS03S0000","iparam2":"","iparam3":"","iparam4":"","iparam5":"","iparam6":"","iparam7":"","rowStatus":"C"}}'
         step = Xhr(None)
         map_id = self.get('map_id')
@@ -64,10 +64,10 @@ class Reference:
         step.setInputDataValue('input1', 0, 'iparam5', iparam5)
 
         step.setInputDataValue('input1', 0, 'iparam6', paging)
-        step.setInputDataValue('input1', 0, 'iparam7', 1)
+        step.setInputDataValue('input1', 0, 'iparam7', row_cnt)
         step.startStep()
 
-        #print(paging, step.getDataList(data_list_id='output1'))
+        print(paging, step.getDataList(data_list_id='output1'))
 
         config = Config()
         replay_cnt = int(config.get('section_reference', 'REPLAY_CNT'))
@@ -128,9 +128,9 @@ class Reference:
         return value
 
 
-    def getValue(self, paging=1):
+    def getValue(self, paging=1, row_cnt=1):
         if self.ref_type == 'SVC COMBO (Swing Only)':
-            value = self.getXhrSvcCombo(paging)
+            value = self.getXhrSvcCombo(paging, row_cnt)
         elif self.ref_type == 'SQL':
             query = self.get('query')
             value = query.getSql()

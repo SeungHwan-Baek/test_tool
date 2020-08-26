@@ -1,4 +1,5 @@
 import os
+import copy
 import pickle
 import datetime
 from datetime import date
@@ -41,6 +42,7 @@ class Case(object):
         self.variables = {}
         self.selectedStepRow = -1
         self.status = -1
+        self.worker_index = 0
         self.caseId = str(uuid.uuid4())
 
         self.setCategory(category)
@@ -88,6 +90,9 @@ class Case(object):
     def setStatus(self, status):
         self.status = status
 
+    def setWorkerIndex(self, worker_index):
+        self.worker_index = worker_index
+
     def getCaseId(self):
         return self.caseId
 
@@ -123,6 +128,13 @@ class Case(object):
 
     def getSelectedStepRow(self):
         return self.selectedStepRow
+
+    def getWorkerIndex(self):
+        try:
+            return self.worker_index
+        except AttributeError:
+            return False
+
 
     # ============================ Variable ============================
     def getApplicableVariables(self, step=None, row_index=-1, column_id='', seq=-1):
@@ -475,7 +487,8 @@ class Case(object):
 
         return ref_data_list
 
-    def getVariableValue(self, ref_data, paging=1):
+
+    def getVariableValue(self, ref_data, paging=1, row_cnt=1):
         '''
         Reference Data를 참조하는 variable 중 선수행하여 값의 조회가 필요한 경우 수행
             - SQL, SVC COMBO는 CASE 수행 시 1회만 수행
@@ -498,7 +511,8 @@ class Case(object):
         ref_data = ref_data_list[ref_data_index]
 
         if ref_data:
-            ref_data.getValue(paging)
+            ref_data.getValue(paging, row_cnt)
+
 
     def getAutoVariableDataList(self):
         '''
@@ -589,6 +603,7 @@ class Case(object):
 
                 self.setVariableList(var)
                 self.setStepRefByValue(value, variable_id, min_row=self.findStepIndexByStep(row_step), exact_match=True, apply=True)
+
 
     def getAutoVariableSvcCombo(self):
         auto_svc_combo_variable_list = []
